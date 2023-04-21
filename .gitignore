@@ -1,0 +1,12 @@
+.*
+*.egg-info
+__pycache__
+/dist/
+/coverage.json
+/coverage.xml
+
+!.github
+!.editorconfig
+!.flake8
+!.gitignore
+!.gitkeep
