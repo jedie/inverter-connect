@@ -13,8 +13,10 @@ from rich_click import RichGroup
 
 import inverter
 from inverter import constants
-from inverter.connection import ERROR_STR_NO_DATA, Config, InverterSock, ModbusReadResult
-from inverter.definitions import get_parameter
+from inverter.api import Inverter, ValueType
+from inverter.config import Config
+from inverter.connection import ERROR_STR_NO_DATA, InverterSock
+from inverter.definitions import Parameter
 
 
 logger = logging.getLogger(__name__)
@@ -320,34 +322,27 @@ def print_values(ip, port, debug):
         level = logging.INFO
 
     logging.basicConfig(level=level)
-    parameters = get_parameter(yaml_filename='deye_2mppt.yaml', debug=debug)
-    config = Config(host=ip, port=port, debug=debug)
-    if debug:
-        print(config)
-
-    with InverterSock(config) as inv_sock:
-        print(inv_sock.inverter_info)
-        print()
-
-        for parameter in parameters:
-            if debug:
-                print('_' * 100)
-                print(parameter.name)
-
-            result: ModbusReadResult = inv_sock.read(parameter=parameter)
-
-            print(f'\t* [yellow]{result.parameter.name:<31}[/yellow]:', end=' ')
-            if result.parsed_value == ERROR_STR_NO_DATA:
+    config = Config(yaml_filename='deye_2mppt.yaml', host=ip, port=port, debug=debug)
+    with Inverter(config=config) as inverter:
+        for value in inverter:
+            print(f'\t* [yellow]{value.name:<31}[/yellow]:', end=' ')
+            if value.value == ERROR_STR_NO_DATA:
                 color = 'red'
-                value = ERROR_STR_NO_DATA
+                msg = ERROR_STR_NO_DATA
             else:
                 color = 'green'
-                value = f'{result.parsed_value} {result.parameter.unit}'
-            print(f'[{color}]{value:<11}[/{color}]', end=' ')
+                msg = f'{value.value} {value.unit}'
+            print(f'[{color}]{msg:<11}[/{color}]', end=' ')
 
-            print(
-                f'(Register: [cyan]{parameter.start_register:04X}[/cyan], length:' f' [blue]{parameter.length}[/blue])'
-            )
+            if value.type == ValueType.READ_OUT:
+                parameter: Parameter = value.result.parameter
+                print(
+                    f'(Register: [cyan]{parameter.start_register:04X}[/cyan], length:'
+                    f' [blue]{parameter.length}[/blue])'
+                )
+            elif value.type == ValueType.COMPUTED:
+                print('(Computed)')
+
             if debug:
                 print()
 
@@ -393,9 +388,11 @@ def print_at_commands(ip, port, commands, debug):
             'WSSSID',
             'WSKEY',
             'YZAPP',
+            'UPURL',
+            'WAPMXSTA',  # max. number of wifi clients
         )
 
-    config = Config(host=ip, port=port, debug=debug)
+    config = Config(yaml_filename=None, host=ip, port=port, debug=debug)
     if debug:
         print(config)
 
