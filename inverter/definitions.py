@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import dataclasses
+from collections.abc import Iterable
+from typing import Callable
 
 import yaml
 from bx_py_utils.dict_utils import pluck
@@ -18,7 +20,7 @@ class Parameter:
     name: str
     unit: str
     scale: float | int
-    parser: callable
+    parser: Callable
     offset: int | None = None
     lookup: dict | None = None
 
@@ -46,7 +48,7 @@ def convert_lookup(raw_lookup: list):
     return {entry['key']: entry['value'] for entry in raw_lookup}
 
 
-def get_parameter(yaml_filename, debug=False):
+def get_parameter(yaml_filename, debug=False) -> Iterable[Parameter]:
     data = get_definition(yaml_filename)
     parameters = []
     for group_data in data:

@@ -5,6 +5,7 @@ import logging
 import socket
 import time
 
+from inverter.config import Config
 from inverter.definitions import Parameter
 
 
@@ -19,16 +20,6 @@ class ModbusNoData(KeyError):
     """
 
     pass
-
-
-@dataclasses.dataclass
-class Config:
-    host: str
-    port: int = 48899
-    pause: float = 0.1
-    timeout: int = 5
-    debug: bool = False
-    init_cmd: bytes = b'WIFIKIT-214028-READ'
 
 
 @dataclasses.dataclass
