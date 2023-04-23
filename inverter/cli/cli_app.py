@@ -169,6 +169,7 @@ def publish():
     publish_package(
         module=inverter,
         package_path=PACKAGE_ROOT,
+        distribution_name='inverter-connect',
     )
 
 
