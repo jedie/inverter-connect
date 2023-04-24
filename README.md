@@ -48,14 +48,18 @@ Usage: ./cli.py [OPTIONS] COMMAND [ARGS]...
 ╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────╮
 │ check-code-style            Check code style by calling darker + flake8                          │
 │ coverage                    Run and show coverage.                                               │
+│ debug-settings              Display (anonymized) MQTT server username and password               │
 │ fix-code-style              Fix code style of all inverter source code files via darker          │
 │ install                     Run pip-sync and install 'inverter' via pip as editable.             │
 │ mypy                        Run Mypy (configured in pyproject.toml)                              │
 │ print-at-commands           Print one or more AT command values from Inverter.                   │
 │ print-values                Print all known register values from Inverter, e.g.:                 │
 │ publish                     Build and upload this project to PyPi                                │
+│ publish-loop                Publish current data via MQTT (endless loop)                         │
 │ safety                      Run safety check against current requirements files                  │
+│ store-settings              Store MQTT server settings.                                          │
 │ test                        Run unittests                                                        │
+│ test-mqtt-connection        Test connection to MQTT Server                                       │
 │ tox                         Run tox                                                              │
 │ update                      Update "requirements*.txt" dependencies files                        │
 │ update-test-snapshot-files  Update all test snapshot files (by remove and recreate all snapshot  │

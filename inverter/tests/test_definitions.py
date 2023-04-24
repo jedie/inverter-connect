@@ -34,6 +34,8 @@ class DefinitionsTestCase(TestCase):
                 length=1,
                 group='solar',
                 name='PV1 Voltage',
+                device_class='voltage',
+                state_class='measurement',
                 unit='V',
                 scale=0.1,
                 parser=example.parser,

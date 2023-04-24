@@ -23,7 +23,9 @@ class InverterValue:
     type: ValueType
     name: str
     value: float | str
-    unit: str
+    device_class: str  # e.g.: "voltage" / "current" / "energy" etc.
+    state_class: str | None  # e.g.: "measurement" / "total" / "total_increasing" etc.
+    unit: str  # e.g.: "V" / "A" / "kWh" etc.
     result: ModbusReadResult | None
 
 
@@ -38,35 +40,42 @@ def compute_values(values: dict) -> Iterable[InverterValue]:
             name = f'{section} Power'
             voltage: InverterValue = values[voltage_name]
             current: InverterValue = values[current_name]
-            power = voltage.value * current.value
-
-            if total_power is None:
-                total_power = power
+            try:
+                power = voltage.value * current.value
+            except TypeError as err:
+                print(f'[red]Error calculate: {voltage.value=!r} * {current.value=!r}: {err}')
             else:
-                total_power += power
-            logging.debug(
-                'Compute %r from %s %r and %s %r = %s',
-                name,
-                voltage_name,
-                voltage.value,
-                current_name,
-                current.value,
-                total_power,
-            )
-            power = round(power, 1)
-            yield InverterValue(
-                type=ValueType.COMPUTED,
-                name=name,
-                value=power,
-                unit='W',
-                result=None,
-            )
+                if total_power is None:
+                    total_power = power
+                else:
+                    total_power += power
+                logging.debug(
+                    'Compute %r from %s %r and %s %r = %s',
+                    name,
+                    voltage_name,
+                    voltage.value,
+                    current_name,
+                    current.value,
+                    total_power,
+                )
+                power = round(power, 2)
+                yield InverterValue(
+                    type=ValueType.COMPUTED,
+                    name=name,
+                    value=power,
+                    device_class='power',
+                    state_class='measurement',
+                    unit='W',
+                    result=None,
+                )
 
     if total_power is not None:
         yield InverterValue(
             type=ValueType.COMPUTED,
             name='Total Power',
-            value=round(total_power, 1),
+            value=round(total_power, 2),
+            device_class='power',
+            state_class='measurement',
             unit='W',
             result=None,
         )
@@ -92,6 +101,8 @@ class Inverter:
                 type=ValueType.READ_OUT,
                 name=name,
                 value=result.parsed_value,
+                device_class=parameter.device_class,
+                state_class=parameter.state_class,
                 unit=parameter.unit,
                 result=result,
             )

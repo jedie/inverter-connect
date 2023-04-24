@@ -6,20 +6,12 @@ import socket
 import time
 
 from inverter.config import Config
+from inverter.constants import ERROR_STR_NO_DATA
 from inverter.definitions import Parameter
+from inverter.exceptions import CrcError, ModbusNoData, ParseModbusValueError, ReadTimeout
 
 
 logger = logging.getLogger(__name__)
-
-ERROR_STR_NO_DATA = 'no data'
-
-
-class ModbusNoData(KeyError):
-    """
-    Modbus register value is: 'no data' == ERROR_STR_NO_DATA
-    """
-
-    pass
 
 
 @dataclasses.dataclass
@@ -60,8 +52,8 @@ def make_modbus_result(*, response: ModbusResponse, parameter: Parameter) -> Mod
             offset=parameter.offset,
             lookup=parameter.lookup,
         )
-    except ValueError as err:
-        raise ValueError(f'Parser error with {response=} {parameter=}: {err}')
+    except (ValueError, AssertionError) as err:
+        raise ParseModbusValueError(f'Parser error with {response=} {parameter=}: {err}')
     logger.debug(f'{parsed_value=}')
     result = ModbusReadResult(parameter=parameter, response=response, parsed_value=parsed_value)
     logger.debug('%s', result)
@@ -147,7 +139,7 @@ def parse_modbus_response(data: str) -> ModbusResponse:
     calculated_crc = calculated_crc.to_bytes(2, 'little')
     got_crc = data_bytes[-2:]
     if got_crc != calculated_crc:
-        raise AssertionError(f'{got_crc.hex()=} {calculated_crc.hex()=} from {data=}')
+        raise CrcError(f'{got_crc.hex()=} {calculated_crc.hex()=} from {data=}')
 
     length = data_bytes[2]
     data = data_bytes[3:-2]
@@ -198,7 +190,7 @@ class InverterSock:
         try:
             data = self.sock.recv(buffer_size)
         except TimeoutError as err:
-            raise TimeoutError(f'Get no response from {self.config.host}: {err}')
+            raise ReadTimeout(f'Get no response from {self.config.host}: {err}')
         if self.config.debug:
             print(f'{data}', flush=True)
 
@@ -248,8 +240,8 @@ class InverterSock:
 
         try:
             response: ModbusResponse = parse_modbus_response(data=data)
-        except ValueError as err:
-            raise ValueError(f'parse error: {data=}: {err}')
+        except ParseModbusValueError as err:
+            raise ParseModbusValueError(f'parse error: {data=}: {err}')
         except ModbusNoData:
             # Modbus register value is: b'no data'
             result = ModbusReadResult(parameter=parameter, parsed_value='no data')
