@@ -17,9 +17,11 @@ class Parameter:
     start_register: int
     length: int
     group: str
-    name: str
-    unit: str
-    scale: float | int
+    name: str  # e.g.: "PV1 Voltage" / "PV1 Current" / "Daily Production" etc.
+    device_class: str  # e.g.: "voltage" / "current" / "energy" etc.
+    state_class: str | None  # e.g.: "measurement" / "total" / "total_increasing" etc.
+    unit: str  # e.g.: "V" / "A" / "kWh" etc.
+    scale: float | int  # e.g.: 1 / 0.1
     parser: Callable
     offset: int | None = None
     lookup: dict | None = None
@@ -67,7 +69,7 @@ def get_parameter(yaml_filename, debug=False) -> Iterable[Parameter]:
             rule = item['rule']
             registers = item['registers']
 
-            parameter_kwargs = pluck(item, keys=['name', 'scale', 'offset'])
+            parameter_kwargs = pluck(item, keys=['name', 'state_class', 'scale', 'offset'])
             if lookup := item.get('lookup'):
                 lookup = convert_lookup(lookup)
 
@@ -80,6 +82,7 @@ def get_parameter(yaml_filename, debug=False) -> Iterable[Parameter]:
                 lookup=lookup,
                 unit=item['uom'],
                 parser=converter_func,
+                device_class=item['class'],
                 **parameter_kwargs,
             )
             parameters.append(parameter)

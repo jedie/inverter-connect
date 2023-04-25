@@ -28,7 +28,7 @@ def hex2int(*, data_hex: str, scale, offset) -> int:
     number = number * scale
     logger.debug(f'{number=}')
 
-    result = round(number, 1)
+    result = round(number, 2)
     logger.debug(f'{result=}')
     return result
 

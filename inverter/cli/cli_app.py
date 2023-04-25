@@ -1,3 +1,4 @@
+import getpass
 import logging
 import sys
 from pathlib import Path
@@ -9,14 +10,21 @@ from manageprojects.utilities.publish import publish_package
 from manageprojects.utilities.subprocess_utils import verbose_check_call
 from manageprojects.utilities.version_info import print_version
 from rich import print  # noqa
+from rich.pretty import pprint
 from rich_click import RichGroup
 
 import inverter
 from inverter import constants
 from inverter.api import Inverter, ValueType
 from inverter.config import Config
-from inverter.connection import ERROR_STR_NO_DATA, InverterSock
+from inverter.connection import InverterInfo, InverterSock
+from inverter.constants import ERROR_STR_NO_DATA
 from inverter.definitions import Parameter
+from inverter.mqtt4homeassistant.data_classes import MqttSettings
+from inverter.mqtt4homeassistant.mqtt import get_connected_client
+from inverter.publish_loop import publish_forever
+from inverter.utilities.credentials import get_mqtt_settings, store_mqtt_settings
+from inverter.utilities.log_setup import basic_log_setup
 
 
 logger = logging.getLogger(__name__)
@@ -317,14 +325,14 @@ def print_values(ip, port, debug):
 
     .../inverter-connect$ ./cli.py print-values 192.168.123.456
     """
-    if debug:
-        level = logging.DEBUG
-    else:
-        level = logging.INFO
+    basic_log_setup(debug=debug)
 
-    logging.basicConfig(level=level)
     config = Config(yaml_filename='deye_2mppt.yaml', host=ip, port=port, debug=debug)
     with Inverter(config=config) as inverter:
+        inverter_info: InverterInfo = inverter.inv_sock.inverter_info
+        print(inverter_info)
+        print()
+
         for value in inverter:
             print(f'\t* [yellow]{value.name:<31}[/yellow]:', end=' ')
             if value.value == ERROR_STR_NO_DATA:
@@ -373,12 +381,7 @@ def print_at_commands(ip, port, commands, debug):
 
     (Note: The prefix "AT+" will be added to every command)
     """
-    if debug:
-        level = logging.DEBUG
-    else:
-        level = logging.INFO
-
-    logging.basicConfig(level=level)
+    basic_log_setup(debug=debug)
 
     if not commands:
         commands = (
@@ -398,7 +401,8 @@ def print_at_commands(ip, port, commands, debug):
         print(config)
 
     with InverterSock(config) as inv_sock:
-        print(inv_sock.inverter_info)
+        inverter_info: InverterInfo = inv_sock.inverter_info
+        print(inverter_info)
         print()
 
         for command in commands:
@@ -409,6 +413,110 @@ def print_at_commands(ip, port, commands, debug):
 
 cli.add_command(print_at_commands)
 
+
+######################################################################################################
+# MQTT
+
+
+@click.command()
+@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
+def store_settings(debug):
+    """
+    Store MQTT server settings.
+    """
+    basic_log_setup(debug=debug)
+
+    try:
+        settings: MqttSettings = get_mqtt_settings()
+    except FileNotFoundError:
+        print('No settings stored, yet. ok.')
+        print()
+        print('Input settings:')
+    else:
+        print('Current settings:')
+        pprint(settings.anonymized())
+        print()
+        print('Input new settings:')
+
+    host = input('host (e.g.: "test.mosquitto.org"): ')
+    if not host:
+        print('Host is needed! Abort.')
+        sys.exit(1)
+
+    port = input('port (default: 1883): ')
+    if port:
+        port = int(port)
+    else:
+        port = 1883
+    user_name = input('user name: ')
+    password = getpass.getpass('password: ')
+
+    settings = MqttSettings(host=host, port=port, user_name=user_name, password=password)
+    file_path = store_mqtt_settings(settings)
+    print(f'MQTT server settings stored into: {file_path}')
+
+
+cli.add_command(store_settings)
+
+
+@click.command()
+@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
+def debug_settings(debug):
+    """
+    Display (anonymized) MQTT server username and password
+    """
+    basic_log_setup(debug=debug)
+    settings: MqttSettings = get_mqtt_settings()
+    pprint(settings.anonymized())
+
+
+cli.add_command(debug_settings)
+
+
+@click.command()
+@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
+def test_mqtt_connection(debug):
+    """
+    Test connection to MQTT Server
+    """
+    basic_log_setup(debug=debug)
+    settings: MqttSettings = get_mqtt_settings()
+    mqttc = get_connected_client(settings=settings, verbose=True)
+    mqttc.loop_start()
+    mqttc.loop_stop()
+    mqttc.disconnect()
+    print('\n[green]Test succeed[/green], bye ;)')
+
+
+cli.add_command(test_mqtt_connection)
+
+
+@click.command()
+@click.argument('ip')
+@click.option(
+    '--port', type=click.IntRange(1000, 65535), default=48899, help='Port of the inverter', show_default=True
+)
+@click.option('--log/--no-log', **OPTION_ARGS_DEFAULT_TRUE)
+@click.option('--verbose/--no-verbose', **OPTION_ARGS_DEFAULT_TRUE)
+@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
+def publish_loop(ip, port, log, verbose, debug):
+    """
+    Publish current data via MQTT (endless loop)
+    """
+    if log:
+        basic_log_setup(debug=debug)
+
+    config = Config(yaml_filename='deye_2mppt.yaml', host=ip, port=port, debug=debug)
+
+    mqtt_settings: MqttSettings = get_mqtt_settings()
+    pprint(mqtt_settings.anonymized())
+    try:
+        publish_forever(mqtt_settings=mqtt_settings, config=config, verbose=verbose)
+    except KeyboardInterrupt:
+        print('Bye, bye')
+
+
+cli.add_command(publish_loop)
 
 ######################################################################################################
 

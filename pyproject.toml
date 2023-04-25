@@ -9,6 +9,7 @@ authors = [
 ]
 requires-python = ">=3.9,<4"
 dependencies = [
+    "paho-mqtt",  # https://pypi.org/project/paho-mqtt/
     "pyyaml",  # https://github.com/yaml/pyyaml
     "bx_py_utils",  # https://github.com/boxine/bx_py_utils
     "click",  # https://github.com/pallets/click/
