@@ -8,6 +8,7 @@ def values2mqtt_payload(
     default_device_class: str = 'energy',
     default_state_class: str = 'measurement',
 ) -> HaMqttPayload:
+    assert not name_prefix[0].isdigit(), f'Invalid: {name_prefix=}'
     device_id = f'{slugify(name_prefix).lower()}_{slugify(values.device_name).lower()}'
     state = {
         'data': {},
