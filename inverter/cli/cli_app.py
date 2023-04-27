@@ -394,6 +394,8 @@ def print_at_commands(ip, port, commands, debug):
             'YZAPP',
             'UPURL',
             'WAPMXSTA',  # max. number of wifi clients
+            'NTPTM',  # NTP date time? e.g.: "1970-1-1  0:3:9  Thur"
+            'NTPRF',  # NTP request interval in min (?)
         )
 
     config = Config(yaml_filename=None, host=ip, port=port, debug=debug)
