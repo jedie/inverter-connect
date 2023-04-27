@@ -6,9 +6,9 @@ import socket
 import time
 
 from inverter.config import Config
-from inverter.constants import ERROR_STR_NO_DATA
+from inverter.constants import AT_READ_FUNC_NUMBER, AT_WRITE_FUNC_NUMBER, ERROR_STR_NO_DATA
 from inverter.definitions import Parameter
-from inverter.exceptions import CrcError, ModbusNoData, ParseModbusValueError, ReadTimeout
+from inverter.exceptions import CrcError, ModbusNoData, ModbusNoHexData, ParseModbusValueError, ReadTimeout
 
 
 logger = logging.getLogger(__name__)
@@ -90,12 +90,14 @@ def get_business_field(start_register, length, slave_id, modbus_function):
     return request_data
 
 
-def parameter2modbus_at_command(start_register: int, length: int) -> str:
+def parameter2modbus_at_command(start_register: int, length: int, modbus_function: int) -> str:
     """
-    >>> parameter2modbus_at_command(start_register=0x0056, length=1)
+    >>> parameter2modbus_at_command(start_register=0x0056, length=1, modbus_function=3)
     'INVDATA=8,010300560001641a'
     """
-    request_data = get_business_field(start_register=start_register, length=length, slave_id=1, modbus_function=3)
+    request_data = get_business_field(
+        start_register=start_register, length=length, slave_id=1, modbus_function=modbus_function
+    )
     cmd_length = len(request_data)
     at_command = f'INVDATA={cmd_length},{request_data.hex()}'
     return at_command
@@ -131,7 +133,7 @@ def parse_modbus_response(data: str) -> ModbusResponse:
         data_bytes = bytes.fromhex(data)
     except ValueError as err:
         logger.warning(f'Value error with {data=}: {err}')
-        raise ModbusNoData
+        raise ModbusNoHexData(data=data)
 
     logger.debug(f'{data_bytes=}')
 
@@ -229,22 +231,52 @@ class InverterSock:
         data = data.split(',')
         return InverterInfo(ip=data[0], mac=data[1], serial=int(data[2]))
 
-    def read(self, *, parameter: Parameter) -> ModbusReadResult:
+    def read(self, *, start_register: int, length: int) -> ModbusResponse:
         if self.config.debug:
-            print(parameter)
-        command = parameter2modbus_at_command(start_register=parameter.start_register, length=parameter.length)
+            print(f'Read {length} value(s) from {start_register=!r}')
+
+        command = parameter2modbus_at_command(
+            start_register=start_register,
+            length=length,
+            modbus_function=AT_READ_FUNC_NUMBER,
+        )
         if self.config.debug:
             print(f'AT command: {command}')
 
         data: str = self.cleaned_at_command(command=command)
-
         try:
             response: ModbusResponse = parse_modbus_response(data=data)
         except ParseModbusValueError as err:
             raise ParseModbusValueError(f'parse error: {data=}: {err}')
+        return response
+
+    def read_paremeter(self, *, parameter: Parameter) -> ModbusReadResult:
+        if self.config.debug:
+            print(parameter)
+
+        try:
+            response: ModbusResponse = self.read(
+                start_register=parameter.start_register,
+                length=parameter.length,
+            )
         except ModbusNoData:
             # Modbus register value is: b'no data'
             result = ModbusReadResult(parameter=parameter, parsed_value='no data')
         else:
             result: ModbusReadResult = make_modbus_result(response=response, parameter=parameter)
         return result
+
+    def write(self, *, address: int, values: list[int, ...]):
+        if self.config.debug:
+            print(f'Write {" ".join(hex(value) for value in values)} to {hex(address)}')
+
+        command = parameter2modbus_at_command(
+            start_register=address,
+            length=len(values),
+            modbus_function=AT_WRITE_FUNC_NUMBER,
+        )
+        if self.config.debug:
+            print(f'AT command: {command}')
+
+        data: str = self.cleaned_at_command(command=command)
+        return data

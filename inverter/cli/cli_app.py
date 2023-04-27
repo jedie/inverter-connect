@@ -1,3 +1,4 @@
+import datetime
 import getpass
 import logging
 import sys
@@ -17,12 +18,14 @@ import inverter
 from inverter import constants
 from inverter.api import Inverter, ValueType
 from inverter.config import Config
-from inverter.connection import InverterInfo, InverterSock
+from inverter.connection import InverterInfo, InverterSock, ModbusResponse
 from inverter.constants import ERROR_STR_NO_DATA
 from inverter.definitions import Parameter
+from inverter.exceptions import ModbusNoData, ModbusNoHexData
 from inverter.mqtt4homeassistant.data_classes import MqttSettings
 from inverter.mqtt4homeassistant.mqtt import get_connected_client
 from inverter.publish_loop import publish_forever
+from inverter.utilities.cli import convert_address_option
 from inverter.utilities.credentials import get_mqtt_settings, store_mqtt_settings
 from inverter.utilities.log_setup import basic_log_setup
 
@@ -414,6 +417,87 @@ def print_at_commands(ip, port, commands, debug):
 
 
 cli.add_command(print_at_commands)
+
+
+@click.command()
+@click.argument('ip')
+@click.option(
+    '--port', type=click.IntRange(1000, 65535), default=48899, help='Port of the inverter', show_default=True
+)
+@click.option('--register', default="0x22", help='Start address', show_default=True)
+@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_TRUE)
+def set_time(ip, port, register, debug):
+    """
+    Set current date time in the inverter device.
+    """
+    address = convert_address_option(raw_address=register, debug=debug)
+
+    config = Config(yaml_filename=None, host=ip, port=port, debug=debug)
+    if debug:
+        print(config)
+
+    with InverterSock(config) as inv_sock:
+        inverter_info: InverterInfo = inv_sock.inverter_info
+        print(inverter_info)
+        print()
+
+        now = datetime.datetime.now()
+        print(f'Send current time: {now}')
+        values = [
+            256 * (now.year % 100) + now.month,
+            256 * now.day + now.hour,
+            256 * now.minute + now.second,
+        ]
+        data = inv_sock.write(address=address, values=values)
+        print(f'Response: {data!r}')
+
+
+cli.add_command(set_time)
+
+
+@click.command()
+@click.argument('ip')
+@click.option(
+    '--port', type=click.IntRange(1000, 65535), default=48899, help='Port of the inverter', show_default=True
+)
+@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_TRUE)
+@click.argument('register')
+@click.argument('length', type=click.IntRange(1, 100))
+def read_register(ip, port, register, length, debug):
+    """
+    Read register(s) from the inverter
+
+    e.g.: read the first 32 bytes:
+
+    .../inverter-connect$ ./cli.py read-register 192.168.123.456 0 32
+
+    The start address can be pass as decimal number or as hex string, e.g.: 0x123
+    """
+    print(f'Read {length} value(s) from {register=!r} ({ip}:{port})')
+    address = convert_address_option(raw_address=register, debug=debug)
+
+    config = Config(yaml_filename=None, host=ip, port=port, debug=debug)
+    if debug:
+        print(config)
+
+    with InverterSock(config) as inv_sock:
+        inverter_info: InverterInfo = inv_sock.inverter_info
+        print(inverter_info)
+        print()
+
+        try:
+            response: ModbusResponse = inv_sock.read(start_register=address, length=length)
+        except ModbusNoHexData as err:
+            print(f'[yellow]Non hex response: [magenta]{err.data!r}')
+        except ModbusNoData:
+            print('[yellow]no data')
+        else:
+            print(response)
+            print()
+            print(f'Result (in hex): [cyan]{response.data_hex}')
+
+
+cli.add_command(read_register)
 
 
 ######################################################################################################
