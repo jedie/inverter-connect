@@ -2,6 +2,7 @@ import datetime
 import getpass
 import logging
 import sys
+import time
 from pathlib import Path
 
 import rich_click as click
@@ -424,11 +425,16 @@ cli.add_command(print_at_commands)
 @click.option(
     '--port', type=click.IntRange(1000, 65535), default=48899, help='Port of the inverter', show_default=True
 )
-@click.option('--register', default="0x22", help='Start address', show_default=True)
+@click.option('--register', default="0x16", help='Start address', show_default=True)
 @click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_TRUE)
 def set_time(ip, port, register, debug):
     """
     Set current date time in the inverter device.
+
+    Default start address is 0x16, so that this will be filled:
+        0x16 - year + month
+        0x17 - day + hour
+        0x18 - minute + second
     """
     address = convert_address_option(raw_address=register, debug=debug)
 
@@ -450,6 +456,11 @@ def set_time(ip, port, register, debug):
         ]
         data = inv_sock.write(address=address, values=values)
         print(f'Response: {data!r}')
+
+        print('\nCheck time by request "AT+NTPTM"', end='...')
+        time.sleep(1)
+        result: str = inv_sock.cleaned_at_command(command='NTPTM')
+        print(f'[green]{result}')
 
 
 cli.add_command(set_time)
