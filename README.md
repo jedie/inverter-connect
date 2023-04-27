@@ -56,7 +56,9 @@ Usage: ./cli.py [OPTIONS] COMMAND [ARGS]...
 │ print-values                Print all known register values from Inverter, e.g.:                 │
 │ publish                     Build and upload this project to PyPi                                │
 │ publish-loop                Publish current data via MQTT (endless loop)                         │
+│ read-register               Read register(s) from the inverter                                   │
 │ safety                      Run safety check against current requirements files                  │
+│ set-time                    Set current date time in the inverter device.                        │
 │ store-settings              Store MQTT server settings.                                          │
 │ test                        Run unittests                                                        │
 │ test-mqtt-connection        Test connection to MQTT Server                                       │

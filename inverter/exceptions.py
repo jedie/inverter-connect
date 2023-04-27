@@ -10,6 +10,11 @@ class ModbusNoData(ReadInverterError):
     pass
 
 
+class ModbusNoHexData(ModbusNoData):
+    def __init__(self, data: str):
+        self.data = data
+
+
 class CrcError(ReadInverterError):
     pass
 
