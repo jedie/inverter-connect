@@ -14,13 +14,19 @@ The whole thing is just a learning exercise for now. We will see.
 
 Example output of `print-values` call:
 
-![print-values](https://raw.githubusercontent.com/jedie/jedie.github.io/master/screenshots/inverter-connect/2023-04-21_08-53.png "2023-04-21_08-53.png")
+![print-values](https://raw.githubusercontent.com/jedie/jedie.github.io/master/screenshots/inverter-connect/2023-04-28_08-55.png "2023-04-28_08-55.png")
 
 ----
 
 Example output of `print-at-commands` call:
 
-![print-at-commands](https://raw.githubusercontent.com/jedie/jedie.github.io/master/screenshots/inverter-connect/2023-04-21_08-52.png "2023-04-21_08-52.png")
+![print-at-commands](https://raw.githubusercontent.com/jedie/jedie.github.io/master/screenshots/inverter-connect/2023-04-28_08-57.png "2023-04-28_08-57.png")
+
+----
+
+Example output of `read-register` call:
+
+![read-register](https://raw.githubusercontent.com/jedie/jedie.github.io/master/screenshots/inverter-connect/2023-04-28_08-53.png "2023-04-28_08-53.png")
 
 ----
 
