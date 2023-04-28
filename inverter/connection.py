@@ -5,6 +5,8 @@ import logging
 import socket
 import time
 
+from rich import print  # noqa
+
 from inverter.config import Config
 from inverter.constants import AT_READ_FUNC_NUMBER, AT_WRITE_FUNC_NUMBER, ERROR_STR_NO_DATA
 from inverter.definitions import Parameter
@@ -189,14 +191,21 @@ class InverterSock:
         if self.config.debug:
             print('recv', end='...', flush=True)
 
-        try:
-            data = self.sock.recv(buffer_size)
-        except TimeoutError as err:
-            raise ReadTimeout(f'Get no response from {self.config.host}: {err}')
-        if self.config.debug:
-            print(f'{data}', flush=True)
+        for try_count in range(3):
+            try:
+                data = self.sock.recv(buffer_size)
+            except TimeoutError as err:
+                print(err)
+                print('[yellow]retry...')
+                time.sleep(0.25)
+                continue
+            else:
+                if self.config.debug:
+                    print(f'{data}', flush=True)
 
-        return data
+                return data
+
+        raise ReadTimeout(f'Get no response from {self.config.host}')
 
     def at_command(self, command: str, buffer_size=1024):
         assert not command.startswith('AT+'), f'Remove "AT+" prefix from: {command=}'
