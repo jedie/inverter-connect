@@ -26,7 +26,7 @@ from inverter.exceptions import ModbusNoData, ModbusNoHexData
 from inverter.mqtt4homeassistant.data_classes import MqttSettings
 from inverter.mqtt4homeassistant.mqtt import get_connected_client
 from inverter.publish_loop import publish_forever
-from inverter.utilities.cli import convert_address_option
+from inverter.utilities.cli import convert_address_option, print_hex_table
 from inverter.utilities.credentials import get_mqtt_settings, store_mqtt_settings
 from inverter.utilities.log_setup import basic_log_setup
 
@@ -478,13 +478,17 @@ def read_register(ip, port, register, length, debug):
     """
     Read register(s) from the inverter
 
-    e.g.: read the first 32 bytes:
+    e.g.: read 3 registers starting from 0x16:
+
+        .../inverter-connect$ ./cli.py read-register 192.168.123.456 0x16 3
+
+    e.g.: read the first 32 registers:
 
     .../inverter-connect$ ./cli.py read-register 192.168.123.456 0 32
 
     The start address can be pass as decimal number or as hex string, e.g.: 0x123
     """
-    print(f'Read {length} value(s) from {register=!r} ({ip}:{port})')
+    print(f'Read {length} register(s) from {register=!r} ({ip}:{port})')
     address = convert_address_option(raw_address=register, debug=debug)
 
     config = Config(yaml_filename=None, host=ip, port=port, debug=debug)
@@ -504,8 +508,13 @@ def read_register(ip, port, register, length, debug):
             print('[yellow]no data')
         else:
             print(response)
-            print()
-            print(f'Result (in hex): [cyan]{response.data_hex}')
+            print(f'\nResult (in hex): [cyan]{response.data_hex}\n')
+
+            print_hex_table(
+                address=address,
+                data_hex=response.data_hex,
+                title=f'[green][bold]{length} value(s) from {hex(address)}',
+            )
 
 
 cli.add_command(read_register)
