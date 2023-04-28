@@ -19,14 +19,13 @@ import inverter
 from inverter import constants
 from inverter.api import Inverter, ValueType
 from inverter.config import Config
-from inverter.connection import InverterInfo, InverterSock, ModbusResponse
+from inverter.connection import InverterInfo, InverterSock
 from inverter.constants import ERROR_STR_NO_DATA
 from inverter.definitions import Parameter
-from inverter.exceptions import ModbusNoData, ModbusNoHexData
 from inverter.mqtt4homeassistant.data_classes import MqttSettings
 from inverter.mqtt4homeassistant.mqtt import get_connected_client
 from inverter.publish_loop import publish_forever
-from inverter.utilities.cli import convert_address_option, print_hex_table
+from inverter.utilities.cli import convert_address_option, print_register
 from inverter.utilities.credentials import get_mqtt_settings, store_mqtt_settings
 from inverter.utilities.log_setup import basic_log_setup
 
@@ -457,6 +456,10 @@ def set_time(ip, port, register, debug):
         data = inv_sock.write(address=address, values=values)
         print(f'Response: {data!r}')
 
+        print('\nRead register...')
+        time.sleep(1)
+        print_register(inv_sock, start_register=address, length=3)
+
         print('\nCheck time by request "AT+NTPTM"', end='...')
         time.sleep(1)
         result: str = inv_sock.cleaned_at_command(command='NTPTM')
@@ -499,22 +502,7 @@ def read_register(ip, port, register, length, debug):
         inverter_info: InverterInfo = inv_sock.inverter_info
         print(inverter_info)
         print()
-
-        try:
-            response: ModbusResponse = inv_sock.read(start_register=address, length=length)
-        except ModbusNoHexData as err:
-            print(f'[yellow]Non hex response: [magenta]{err.data!r}')
-        except ModbusNoData:
-            print('[yellow]no data')
-        else:
-            print(response)
-            print(f'\nResult (in hex): [cyan]{response.data_hex}\n')
-
-            print_hex_table(
-                address=address,
-                data_hex=response.data_hex,
-                title=f'[green][bold]{length} value(s) from {hex(address)}',
-            )
+        print_register(inv_sock, start_register=address, length=length)
 
 
 cli.add_command(read_register)

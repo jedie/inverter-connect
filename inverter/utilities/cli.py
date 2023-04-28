@@ -3,6 +3,9 @@ from rich import print  # noqa
 from rich.console import Console
 from rich.table import Table
 
+from inverter.connection import ModbusResponse
+from inverter.exceptions import ModbusNoData, ModbusNoHexData
+
 
 def convert_address_option(raw_address: str, debug: bool = True) -> int:
     """
@@ -44,3 +47,21 @@ def print_hex_table(address, data_hex, title):
 
     console = Console()
     console.print(table)
+
+
+def print_register(inv_sock, start_register, length):
+    try:
+        response: ModbusResponse = inv_sock.read(start_register=start_register, length=length)
+    except ModbusNoHexData as err:
+        print(f'[yellow]Non hex response: [magenta]{err.data!r}')
+    except ModbusNoData:
+        print('[yellow]no data')
+    else:
+        print(response)
+        print(f'\nResult (in hex): [cyan]{response.data_hex}\n')
+
+        print_hex_table(
+            address=start_register,
+            data_hex=response.data_hex,
+            title=f'[green][bold]{length} value(s) from {hex(start_register)}',
+        )
