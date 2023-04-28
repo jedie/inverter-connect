@@ -58,3 +58,15 @@ class ReadmeTestCase(BaseTestCase):
             ),
         )
         assert_cli_help_in_readme(text_block=stdout, marker='print-at-commands help')
+
+    def test_read_register(self):
+        stdout = invoke_click(cli, 'read-register', '--help')
+        self.assert_in_content(
+            got=stdout,
+            parts=(
+                'Usage: ./cli.py read-register [OPTIONS] IP REGISTER LENGTH',
+                '--port',
+                '--debug/--no-debug',
+            ),
+        )
+        assert_cli_help_in_readme(text_block=stdout, marker='read-register help')
