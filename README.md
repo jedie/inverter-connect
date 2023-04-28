@@ -10,28 +10,8 @@ Get information from Deye Microinverter
 
 The whole thing is just a learning exercise for now. We will see.
 
-## screenshots
 
-Example output of `print-values` call:
-
-![print-values](https://raw.githubusercontent.com/jedie/jedie.github.io/master/screenshots/inverter-connect/2023-04-28_08-55.png "2023-04-28_08-55.png")
-
-----
-
-Example output of `print-at-commands` call:
-
-![print-at-commands](https://raw.githubusercontent.com/jedie/jedie.github.io/master/screenshots/inverter-connect/2023-04-28_08-57.png "2023-04-28_08-57.png")
-
-----
-
-Example output of `read-register` call:
-
-![read-register](https://raw.githubusercontent.com/jedie/jedie.github.io/master/screenshots/inverter-connect/2023-04-28_08-53.png "2023-04-28_08-53.png")
-
-----
-
-
-## quickstart
+# quickstart
 
 Currently just clone the project and just start the cli (that will create a virtualenv and installs every dependencies)
 
@@ -78,10 +58,10 @@ Usage: ./cli.py [OPTIONS] COMMAND [ARGS]...
 [comment]: <> (✂✂✂ auto generated main help end ✂✂✂)
 
 
-### most important commands
+# most important commands
 
 
-#### print-values
+## print-values
 
 Help from `./cli.py print-values --help` Looks like:
 
@@ -101,8 +81,14 @@ Usage: ./cli.py print-values [OPTIONS] IP
 ```
 [comment]: <> (✂✂✂ auto generated print-values help end ✂✂✂)
 
+Example output of `print-values` call:
 
-#### print-at-commands
+![print-values](https://raw.githubusercontent.com/jedie/jedie.github.io/master/screenshots/inverter-connect/2023-04-28_08-55.png "2023-04-28_08-55.png")
+
+----
+
+
+## print-at-commands
 
 Help from `./cli.py print-at-commands --help` Looks like:
 
@@ -127,8 +113,45 @@ Usage: ./cli.py print-at-commands [OPTIONS] IP [COMMANDS]...
 ```
 [comment]: <> (✂✂✂ auto generated print-at-commands help end ✂✂✂)
 
+Example output of `print-at-commands` call:
 
-## credits
+![print-at-commands](https://raw.githubusercontent.com/jedie/jedie.github.io/master/screenshots/inverter-connect/2023-04-28_08-57.png "2023-04-28_08-57.png")
+
+----
+
+
+## read-register
+
+Help from `./cli.py read-register --help` Looks like:
+
+[comment]: <> (✂✂✂ auto generated read-register help start ✂✂✂)
+```
+Usage: ./cli.py read-register [OPTIONS] IP REGISTER LENGTH
+
+ Read register(s) from the inverter
+ e.g.: read 3 registers starting from 0x16:
+ .../inverter-connect$ ./cli.py read-register 192.168.123.456 0x16 3
+ e.g.: read the first 32 registers:
+ .../inverter-connect$ ./cli.py read-register 192.168.123.456 0 32
+ The start address can be pass as decimal number or as hex string, e.g.: 0x123
+
+╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
+│ --port                INTEGER RANGE [1000<=x<=65535]  Port of the inverter                       │
+│                                                       [default: 48899; 1000<=x<=65535]           │
+│ --debug/--no-debug                                    [default: debug]                           │
+│ --help                                                Show this message and exit.                │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+[comment]: <> (✂✂✂ auto generated read-register help end ✂✂✂)
+
+Example output of `read-register` call:
+
+![read-register](https://raw.githubusercontent.com/jedie/jedie.github.io/master/screenshots/inverter-connect/2023-04-28_08-53.png "2023-04-28_08-53.png")
+
+----
+
+
+# credits
 
 Others before me have done good work. In particular, I have learned a lot from the following projects:
 
@@ -141,6 +164,6 @@ The included definitions yaml files are from:
 https://github.com/StephanJoubert/home_assistant_solarman/tree/main/custom_components/solarman/inverter_definitions
 
 
-## various links
+# various links
 
 * Discussion: https://www.photovoltaikforum.com/thread/201065-inverter-connect-daten-vom-deye-wechselrichter-per-python-abrufen/ (de)
