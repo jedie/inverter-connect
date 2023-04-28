@@ -79,26 +79,52 @@ def modbus_crc(data):
     return crc
 
 
-def get_business_field(start_register, length, slave_id, modbus_function):
+def get_business_field(
+    start_register: int,
+    length: int,
+    slave_id: int,
+    modbus_function: int,
+    values: None | list[int, ...] = None,
+):
     """
     >>> get_business_field(0x0056, length=1, slave_id=1, modbus_function=3).hex()
     '010300560001641a'
+    >>> get_business_field(0x0056, length=1, slave_id=1, modbus_function=10, values=[0xcd]).hex()
+    '010a00560001000200cd34f2'
     """
     request_data = bytearray([slave_id, modbus_function])
     request_data.extend(start_register.to_bytes(2, 'big'))
     request_data.extend(length.to_bytes(2, 'big'))
+
+    if values:
+        assert length == len(values), f'{length=} {values=}'
+        request_data.extend((length * 2).to_bytes(2, 'big'))
+        for value in values:
+            request_data.extend(value.to_bytes(2, 'big'))
+
     crc = modbus_crc(request_data)
     request_data.extend(crc.to_bytes(2, 'little'))
     return request_data
 
 
-def parameter2modbus_at_command(start_register: int, length: int, modbus_function: int) -> str:
+def parameter2modbus_at_command(
+    start_register: int,
+    length: int,
+    modbus_function: int,
+    values: None | list[int, ...] = None,
+) -> str:
     """
     >>> parameter2modbus_at_command(start_register=0x0056, length=1, modbus_function=3)
     'INVDATA=8,010300560001641a'
+    >>> parameter2modbus_at_command(start_register=0x0056, length=1, modbus_function=10, values=[0xcd])
+    'INVDATA=12,010a00560001000200cd34f2'
     """
     request_data = get_business_field(
-        start_register=start_register, length=length, slave_id=1, modbus_function=modbus_function
+        start_register=start_register,
+        length=length,
+        slave_id=1,
+        modbus_function=modbus_function,
+        values=values,
     )
     cmd_length = len(request_data)
     at_command = f'INVDATA={cmd_length},{request_data.hex()}'
@@ -116,12 +142,15 @@ def parse_response(data: bytes) -> RawModBusResponse:
     data = data.replace('\x10', '')  # FIXME
     logger.debug(f'{data=}')
 
-    try:
-        prefix, data = data.split('=', 1)
-    except ValueError as err:
-        raise ValueError(f'{data=}: {err}')
+    if data == '+ok':
+        result = RawModBusResponse(prefix=data, data='')
+    else:
+        try:
+            prefix, data = data.split('=', 1)
+        except ValueError as err:
+            raise ValueError(f'{data=}: {err}')
 
-    result = RawModBusResponse(prefix=prefix, data=data)
+        result = RawModBusResponse(prefix=prefix, data=data)
     logger.debug('%s', result)
     return result
 
@@ -191,27 +220,30 @@ class InverterSock:
         if self.config.debug:
             print('recv', end='...', flush=True)
 
-        for try_count in range(3):
-            try:
-                data = self.sock.recv(buffer_size)
-            except TimeoutError as err:
-                print(err)
-                print('[yellow]retry...')
-                time.sleep(0.25)
-                continue
-            else:
-                if self.config.debug:
-                    print(f'{data}', flush=True)
+        try:
+            data = self.sock.recv(buffer_size)
+        except TimeoutError as err:
+            raise ReadTimeout(f'Get no response from {self.config.host}: {err}')
+        else:
+            if self.config.debug:
+                print(f'{data}', flush=True)
 
-                return data
-
-        raise ReadTimeout(f'Get no response from {self.config.host}')
+            return data
 
     def at_command(self, command: str, buffer_size=1024):
         assert not command.startswith('AT+'), f'Remove "AT+" prefix from: {command=}'
         assert not command.endswith('\n'), f'Line ending found in: {command=}'
         command = f'AT+{command}\n'.encode()
-        return self.recv_command(command=command, buffer_size=buffer_size)
+
+        for try_count in range(3):
+            try:
+                return self.recv_command(command=command, buffer_size=buffer_size)
+            except ReadTimeout as err:
+                logger.warning('%s - retry...', err)
+                self.recv_command(command=self.config.init_cmd)
+                self.send(command=b'+ok')
+                print('retry...', end='')
+        raise ReadTimeout from err  # noqa
 
     def cleaned_at_command(self, command: str, buffer_size=1024) -> str:
         logger.debug(f'cleaned_at_command({command=})')
@@ -242,7 +274,7 @@ class InverterSock:
 
     def read(self, *, start_register: int, length: int) -> ModbusResponse:
         if self.config.debug:
-            print(f'Read {length} value(s) from {start_register=!r}')
+            print(f'Read {length} value(s) from start register: {hex(start_register)}')
 
         command = parameter2modbus_at_command(
             start_register=start_register,
@@ -283,6 +315,7 @@ class InverterSock:
             start_register=address,
             length=len(values),
             modbus_function=AT_WRITE_FUNC_NUMBER,
+            values=values,
         )
         if self.config.debug:
             print(f'AT command: {command}')
