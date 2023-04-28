@@ -382,6 +382,10 @@ def print_at_commands(ip, port, commands, debug):
     .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 WEBVER
     .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 WEBVER WEBU
 
+    e.g.: Set NTP server:
+
+    .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 NTPSER=192.168.1.1
+
     (Note: The prefix "AT+" will be added to every command)
     """
     basic_log_setup(debug=debug)
@@ -398,6 +402,7 @@ def print_at_commands(ip, port, commands, debug):
             'UPURL',
             'WAPMXSTA',  # max. number of wifi clients
             'NTPTM',  # NTP date time? e.g.: "1970-1-1  0:3:9  Thur"
+            'NTPSER',  # set/query NTP server, e.g.: "NTPSER=192.168.1.1"
             'NTPRF',  # NTP request interval in min (?)
         )
 

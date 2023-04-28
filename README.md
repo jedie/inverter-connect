@@ -102,6 +102,8 @@ Usage: ./cli.py print-at-commands [OPTIONS] IP [COMMANDS]...
  Or speficy one or more AT-commands, e.g.:
  .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 WEBVER .../inverter-connect$
  ./cli.py print-at-commands 192.168.123.456 WEBVER WEBU
+ e.g.: Set NTP server:
+ .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 NTPSER=192.168.1.1
  (Note: The prefix "AT+" will be added to every command)
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮

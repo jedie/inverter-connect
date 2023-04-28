@@ -5,6 +5,8 @@ import logging
 from collections.abc import Iterable
 from enum import Enum
 
+from rich import print  # noqa
+
 from inverter.config import Config
 from inverter.connection import InverterSock, ModbusReadResult
 from inverter.definitions import get_parameter
@@ -96,7 +98,17 @@ class Inverter:
         for parameter in self.parameters:
             name = parameter.name
 
-            result: ModbusReadResult = self.inv_sock.read_paremeter(parameter=parameter)
+            result = None  # noqa
+            for try_count in range(3):
+                try:
+                    result: ModbusReadResult = self.inv_sock.read_paremeter(parameter=parameter)
+                except Exception as err:
+                    logger.warning('%s - retry...', err)
+                else:
+                    break
+            if result is None:
+                raise Exception from err  # noqa
+
             value = InverterValue(
                 type=ValueType.READ_OUT,
                 name=name,
