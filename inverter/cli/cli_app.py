@@ -377,14 +377,18 @@ def print_at_commands(ip, port, commands, debug):
 
     .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456
 
-    Or speficy one or more AT-commands, e.g.:
+    Or specify one or more AT-commands, e.g.:
 
     .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 WEBVER
     .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 WEBVER WEBU
 
-    e.g.: Set NTP server:
+    e.g.: Set NTP server, enable NTP and check the values:
 
-    .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 NTPSER=192.168.1.1
+    .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 NTPSER=192.168.1.1 NTPEN=on NTPSER NTPEN
+
+    wait a while and request the current date time:
+
+    .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 NTPTM
 
     (Note: The prefix "AT+" will be added to every command)
     """
@@ -404,6 +408,7 @@ def print_at_commands(ip, port, commands, debug):
             'NTPTM',  # NTP date time? e.g.: "1970-1-1  0:3:9  Thur"
             'NTPSER',  # set/query NTP server, e.g.: "NTPSER=192.168.1.1"
             'NTPRF',  # NTP request interval in min (?)
+            'NTPEN',  # NTP enabled?
         )
 
     config = Config(yaml_filename=None, host=ip, port=port, debug=debug)
