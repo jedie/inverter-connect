@@ -99,11 +99,14 @@ Usage: ./cli.py print-at-commands [OPTIONS] IP [COMMANDS]...
  Print one or more AT command values from Inverter.
  Use all known AT commands, if no one is given, e.g.:
  .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456
- Or speficy one or more AT-commands, e.g.:
+ Or specify one or more AT-commands, e.g.:
  .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 WEBVER .../inverter-connect$
  ./cli.py print-at-commands 192.168.123.456 WEBVER WEBU
- e.g.: Set NTP server:
- .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 NTPSER=192.168.1.1
+ e.g.: Set NTP server, enable NTP and check the values:
+ .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 NTPSER=192.168.1.1 NTPEN=on
+ NTPSER NTPEN
+ wait a while and request the current date time:
+ .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 NTPTM
  (Note: The prefix "AT+" will be added to every command)
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
