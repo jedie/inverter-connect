@@ -34,26 +34,14 @@ Usage: ./cli.py [OPTIONS] COMMAND [ARGS]...
 │ --help      Show this message and exit.                                                          │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────╮
-│ check-code-style            Check code style by calling darker + flake8                          │
-│ coverage                    Run and show coverage.                                               │
 │ debug-settings              Display (anonymized) MQTT server username and password               │
-│ fix-code-style              Fix code style of all inverter source code files via darker          │
-│ install                     Run pip-sync and install 'inverter' via pip as editable.             │
-│ mypy                        Run Mypy (configured in pyproject.toml)                              │
 │ print-at-commands           Print one or more AT command values from Inverter.                   │
 │ print-values                Print all known register values from Inverter, e.g.:                 │
-│ publish                     Build and upload this project to PyPi                                │
 │ publish-loop                Publish current data via MQTT (endless loop)                         │
 │ read-register               Read register(s) from the inverter                                   │
-│ safety                      Run safety check against current requirements files                  │
 │ set-time                    Set current date time in the inverter device.                        │
 │ store-settings              Store MQTT server settings.                                          │
-│ test                        Run unittests                                                        │
 │ test-mqtt-connection        Test connection to MQTT Server                                       │
-│ tox                         Run tox                                                              │
-│ update                      Update "requirements*.txt" dependencies files                        │
-│ update-test-snapshot-files  Update all test snapshot files (by remove and recreate all snapshot  │
-│                             files)                                                               │
 │ version                     Print version and exit                                               │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
@@ -154,6 +142,43 @@ Usage: ./cli.py read-register [OPTIONS] IP REGISTER LENGTH
 Example output of `read-register` call:
 
 ![read-register](https://raw.githubusercontent.com/jedie/jedie.github.io/master/screenshots/inverter-connect/2023-04-28_08-53.png "2023-04-28_08-53.png")
+
+----
+
+
+# start development
+
+For development, we have a separate CLI, just call it:
+```bash
+~/inverter-connect$ ./dev-cli.py --help
+```
+
+The output of `./dev-cli.py --help` looks like:
+
+[comment]: <> (✂✂✂ auto generated dev help start ✂✂✂)
+```
+Usage: ./dev-cli.py [OPTIONS] COMMAND [ARGS]...
+
+╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
+│ --help      Show this message and exit.                                                          │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────╮
+│ check-code-style            Check code style by calling darker + flake8                          │
+│ coverage                    Run and show coverage.                                               │
+│ fix-code-style              Fix code style of all inverter source code files via darker          │
+│ install                     Run pip-sync and install 'inverter' via pip as editable.             │
+│ mypy                        Run Mypy (configured in pyproject.toml)                              │
+│ publish                     Build and upload this project to PyPi                                │
+│ safety                      Run safety check against current requirements files                  │
+│ test                        Run unittests                                                        │
+│ tox                         Run tox                                                              │
+│ update                      Update "requirements*.txt" dependencies files                        │
+│ update-test-snapshot-files  Update all test snapshot files (by remove and recreate all snapshot  │
+│                             files)                                                               │
+│ version                     Print version and exit                                               │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+[comment]: <> (✂✂✂ auto generated dev help end ✂✂✂)
 
 ----
 

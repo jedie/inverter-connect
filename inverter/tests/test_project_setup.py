@@ -12,25 +12,34 @@ from inverter.cli.cli_app import PACKAGE_ROOT
 
 
 class ProjectSetupTestCase(TestCase):
+    app_cli_bin = PACKAGE_ROOT / 'cli.py'
+    dev_cli_bin = PACKAGE_ROOT / 'dev-cli.py'
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+
+        assert_is_file(cls.app_cli_bin)
+        assert_is_file(cls.dev_cli_bin)
+
     def test_version(self):
         self.assertIsNotNone(__version__)
 
         version = Version(__version__)  # Will raise InvalidVersion() if wrong formatted
         self.assertEqual(str(version), __version__)
 
-        cli_bin = PACKAGE_ROOT / 'cli.py'
-        assert_is_file(cli_bin)
+        # The "app" cli:
+        output = subprocess.check_output([self.app_cli_bin, 'version'], text=True)
+        self.assertIn(f'inverter v{__version__}', output)
 
-        output = subprocess.check_output([cli_bin, 'version'], text=True)
+        # The "development" cli:
+        output = subprocess.check_output([self.dev_cli_bin, 'version'], text=True)
         self.assertIn(f'inverter v{__version__}', output)
 
     def test_code_style(self):
-        cli_bin = PACKAGE_ROOT / 'cli.py'
-        assert_is_file(cli_bin)
-
         try:
             output = subprocess_cli(
-                cli_bin=cli_bin,
+                cli_bin=self.dev_cli_bin,
                 args=('check-code-style',),
                 exit_on_error=False,
             )
@@ -45,7 +54,7 @@ class ProjectSetupTestCase(TestCase):
 
         try:
             output = subprocess_cli(
-                cli_bin=cli_bin,
+                cli_bin=self.dev_cli_bin,
                 args=('fix-code-style',),
                 exit_on_error=False,
             )

@@ -46,7 +46,7 @@ ARGUMENT_EXISTING_FILE = dict(
 
 class ClickGroup(RichGroup):  # FIXME: How to set the "info_name" easier?
     def make_context(self, info_name, *args, **kwargs):
-        info_name = './cli.py'
+        info_name = './dev-cli.py'
         return super().make_context(info_name, *args, **kwargs)
 
 
@@ -314,5 +314,4 @@ def main():
             _run_tox()
 
     # Execute Click CLI:
-    cli.name = './dev-cli.py'
     cli()
