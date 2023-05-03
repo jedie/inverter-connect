@@ -15,6 +15,8 @@ The whole thing is just a learning exercise for now. We will see.
 
 Currently just clone the project and just start the cli (that will create a virtualenv and installs every dependencies)
 
+Note: Please enable https://www.piwheels.org/ if you are on a Raspberry Pi !
+
 e.g.:
 ```bash
 ~$ git clone https://github.com/jedie/inverter-connect.git
