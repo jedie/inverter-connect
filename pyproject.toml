@@ -53,7 +53,8 @@ Documentation = "https://github.com/jedie/inverter-connect"
 Source = "https://github.com/jedie/inverter-connect"
 
 [project.scripts]
-inverter = "inverter.__main__:main"
+inverter_app = "inverter.__main__:main"
+inverter_dev = "inverter.cli.dev:main"
 
 [build-system]
 requires = ["setuptools>=61.0", "setuptools_scm>=7.1"]
