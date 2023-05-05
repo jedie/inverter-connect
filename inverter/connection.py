@@ -137,20 +137,25 @@ def parse_response(data: bytes) -> RawModBusResponse:
     RawModBusResponse(prefix='+ok', data='010304015E00009A1D')
     """
     logger.debug(f'parse_response({data=})')
-    data = data.decode('ASCII')
-    data = data.rstrip('\r\n')
-    data = data.replace('\x10', '')  # FIXME
-    logger.debug(f'{data=}')
-
-    if data == '+ok':
-        result = RawModBusResponse(prefix=data, data='')
+    try:
+        data = data.decode('ASCII')
+    except UnicodeDecodeError as err:
+        logger.warning(f'Non ASCII: {data=} ({err})')
+        result = RawModBusResponse(prefix='', data=data)
     else:
-        try:
-            prefix, data = data.split('=', 1)
-        except ValueError as err:
-            raise ValueError(f'{data=}: {err}')
-
-        result = RawModBusResponse(prefix=prefix, data=data)
+        data = data.rstrip('\r\n')
+        data = data.replace('\x10', '')  # FIXME
+        logger.debug(f'{data=}')
+        if data == '+ok':
+            result = RawModBusResponse(prefix=data, data='')
+        else:
+            try:
+                prefix, data = data.split('=', 1)
+            except ValueError:
+                logger.warning(f'Unexpected data: {data=}')
+                result = RawModBusResponse(prefix='', data=data)
+            else:
+                result = RawModBusResponse(prefix=prefix, data=data)
     logger.debug('%s', result)
     return result
 
