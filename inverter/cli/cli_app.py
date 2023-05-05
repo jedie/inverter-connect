@@ -1,7 +1,6 @@
 """
     CLI for usage
 """
-import datetime
 import getpass
 import logging
 import sys
@@ -16,7 +15,7 @@ from rich_click import RichGroup
 
 import inverter
 from inverter import constants
-from inverter.api import Inverter, ValueType
+from inverter.api import Inverter, ValueType, set_current_time
 from inverter.config import Config
 from inverter.connection import InverterInfo, InverterSock
 from inverter.constants import ERROR_STR_NO_DATA
@@ -247,15 +246,7 @@ def set_time(ip, port, register, debug):
         print(inverter_info)
         print()
 
-        now = datetime.datetime.now()
-        print(f'Send current time: {now}')
-        values = [
-            256 * (now.year % 100) + now.month,
-            256 * now.day + now.hour,
-            256 * now.minute + now.second,
-        ]
-        data = inv_sock.write(address=address, values=values)
-        print(f'Response: {data!r}')
+        set_current_time(inv_sock=inv_sock, address=address, verbose=True)
 
         print('\nRead register...')
         time.sleep(1)
@@ -396,7 +387,10 @@ cli.add_command(test_mqtt_connection)
 @click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
 def publish_loop(ip, port, log, verbose, debug):
     """
-    Publish current data via MQTT (endless loop)
+    Publish current data via MQTT for Home Assistant (endless loop)
+
+    The "Daily Production" count will be cleared in the night,
+    by set the current date time via AT-command.
     """
     if log:
         basic_log_setup(debug=debug)
