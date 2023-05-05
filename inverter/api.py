@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 import logging
 from collections.abc import Iterable
+from datetime import datetime
 from enum import Enum
 
 from rich import print  # noqa
@@ -129,3 +130,27 @@ class Inverter:
         self.inv_sock.__exit__(exc_type, exc_val, exc_tb)
         if exc_type:
             return False
+
+
+def set_current_time(inv_sock: InverterSock, address=0x16, verbose=True):
+    """
+    Set current date time in the inverter device.
+
+    Default start address is 0x16, so that this will be filled:
+        0x16 - year + month
+        0x17 - day + hour
+        0x18 - minute + second
+    """
+    now = datetime.now()
+    if verbose:
+        print(f'Send current time: {now}')
+
+    values = [
+        256 * (now.year % 100) + now.month,
+        256 * now.day + now.hour,
+        256 * now.minute + now.second,
+    ]
+    data = inv_sock.write(address=address, values=values)
+
+    if verbose:
+        print(f'Response: {data!r}')

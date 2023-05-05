@@ -34,21 +34,48 @@ Usage: ./cli.py [OPTIONS] COMMAND [ARGS]...
 │ --help      Show this message and exit.                                                          │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────╮
-│ debug-settings              Display (anonymized) MQTT server username and password               │
-│ print-at-commands           Print one or more AT command values from Inverter.                   │
-│ print-values                Print all known register values from Inverter, e.g.:                 │
-│ publish-loop                Publish current data via MQTT (endless loop)                         │
-│ read-register               Read register(s) from the inverter                                   │
-│ set-time                    Set current date time in the inverter device.                        │
-│ store-settings              Store MQTT server settings.                                          │
-│ test-mqtt-connection        Test connection to MQTT Server                                       │
-│ version                     Print version and exit                                               │
+│ debug-settings           Display (anonymized) MQTT server username and password                  │
+│ print-at-commands        Print one or more AT command values from Inverter.                      │
+│ print-values             Print all known register values from Inverter, e.g.:                    │
+│ publish-loop             Publish current data via MQTT for Home Assistant (endless loop)         │
+│ read-register            Read register(s) from the inverter                                      │
+│ set-time                 Set current date time in the inverter device.                           │
+│ store-settings           Store MQTT server settings.                                             │
+│ test-mqtt-connection     Test connection to MQTT Server                                          │
+│ version                  Print version and exit                                                  │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 [comment]: <> (✂✂✂ auto generated main help end ✂✂✂)
 
 
 # most important commands
+
+
+## publish-loop
+
+Help from `./cli.py print-values --help` Looks like:
+
+[comment]: <> (✂✂✂ auto generated publish-loop help start ✂✂✂)
+```
+Usage: ./cli.py publish-loop [OPTIONS] IP
+
+ Publish current data via MQTT for Home Assistant (endless loop)
+ The "Daily Production" count will be cleared in the night, by set the current date time via
+ AT-command.
+
+╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
+│ --port                    INTEGER RANGE [1000<=x<=65535]  Port of the inverter                   │
+│                                                           [default: 48899; 1000<=x<=65535]       │
+│ --log/--no-log                                            [default: log]                         │
+│ --verbose/--no-verbose                                    [default: verbose]                     │
+│ --debug/--no-debug                                        [default: no-debug]                    │
+│ --help                                                    Show this message and exit.            │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+[comment]: <> (✂✂✂ auto generated publish-loop help end ✂✂✂)
+
+
+----
 
 
 ## print-values

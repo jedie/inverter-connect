@@ -49,6 +49,18 @@ class ReadmeTestCase(BaseTestCase):
         )
         assert_cli_help_in_readme(text_block=stdout, marker='dev help')
 
+    def test_publish_loop_help(self):
+        stdout = invoke_click(cli, 'publish-loop', '--help')
+        self.assert_in_content(
+            got=stdout,
+            parts=(
+                'Usage: ./cli.py publish-loop [OPTIONS] IP',
+                '--port',
+                '--debug/--no-debug',
+            ),
+        )
+        assert_cli_help_in_readme(text_block=stdout, marker='publish-loop help')
+
     def test_print_values_help(self):
         stdout = invoke_click(cli, 'print-values', '--help')
         self.assert_in_content(
