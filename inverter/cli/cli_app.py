@@ -159,19 +159,47 @@ def print_at_commands(ip, port, commands, debug):
 
     if not commands:
         commands = (
-            'WANN',
-            'WEBVER',
-            'WEBU',
-            'WAP',
-            'WSSSID',
-            'WSKEY',
+            # 'KEY',  # Set/Get Device Password
+            'VER',
+            'BVER',  # bootloader version
+            'HWVER',  # hardware version
+            'WEBVER',  # web version
+            'YZVER',  # Firmware version
+            'PING',
+            # 'YZWAKEYCTL',
+            # 'YZLOG',
+            # 'YZAPP',
+            # 'YZAPSTAT',
+            # 'YZEXPFUN',
+            # 'MID',
+            #
+            # 'CFGRD',  # current system config
+            # 'SMEM',  # system memory stat
+            'TIME',
+            # 'ADDRESS', # Set/Get Device Address
+            # 'KEY',
+            'NDBGS',  # Set/Get Debug Status
+            'WIFI',  # Set/Get WIFI status: Power up: "WIFI=UP" Power down: "WIFI=DOWN"
+            'WMODE',  # Set/Get the WIFI Operation Mode (AP or STA)
+            'WEBU',  # Set/Get the Login Parameters of WEB page
+            'WAP',  # Set/Get the AP parameters
+            'WSSSID',  # Set/Get the AP's SSID of WIFI STA Mode
+            'WSKEY',  # Set/Get the Security Parameters of WIFI STA Mode
+            'WAKEY',  # Set/Get the Security Parameters of WIFI AP Mode
+            # 'TXPWR',  # Set/Get wifi rf tx power'
+            'WANN',  # Set/Get The WAN setting if in STA mode.
+            'LANN',  # Set/Get The LAN setting if in ADHOC mode.
+            'UPURL',  # Set/Get the path of remote upgrade
             'YZAPP',
-            'UPURL',
-            'WAPMXSTA',  # max. number of wifi clients
+            'WAPMXSTA',  # Set/Get the Max Number Of Sta Connected to Ap
+            # 'WSCAN',  # Get The AP site Survey (only for STA Mode).
             'NTPTM',  # NTP date time? e.g.: "1970-1-1  0:3:9  Thur"
             'NTPSER',  # set/query NTP server, e.g.: "NTPSER=192.168.1.1"
             'NTPRF',  # NTP request interval in min (?)
-            'NTPEN',  # NTP enabled?
+            'NTPEN',  # Enable/Disable NTP Server
+            'WSDNS',  # Set/Get the DNS Server address
+            'DEVICENUM',  # Set/Get Device Link Num
+            'DEVSELCTL',  # Set/Get Web Device List Info
         )
 
     config = Config(yaml_filename=None, host=ip, port=port, debug=debug)
