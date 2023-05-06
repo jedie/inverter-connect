@@ -3,7 +3,7 @@ from rich import print  # noqa
 from rich.console import Console
 from rich.table import Table
 
-from inverter.connection import ModbusResponse
+from inverter.data_types import ModbusResponse
 from inverter.exceptions import ModbusNoData, ModbusNoHexData
 
 

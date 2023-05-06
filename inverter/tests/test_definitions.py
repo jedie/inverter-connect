@@ -1,12 +1,14 @@
 from unittest import TestCase
 
-from inverter.definitions import Parameter, get_definition, get_parameter
+from inverter.data_types import Config, Parameter
+from inverter.definitions import get_definition, get_parameter
 from inverter.utilities.modbus_converter import parse_number
 
 
 class DefinitionsTestCase(TestCase):
     def test_get_definition(self):
-        result = get_definition(yaml_filename='deye_2mppt.yaml')
+        config = Config(inverter_name='deye_2mppt', verbose=False)
+        result = get_definition(config=config)
         self.assertIsInstance(result, list)
         example = result[0]['items'][0]
         self.assertEqual(
@@ -24,7 +26,8 @@ class DefinitionsTestCase(TestCase):
         )
 
     def test_get_parameter(self):
-        parameters = get_parameter(yaml_filename='deye_2mppt.yaml')
+        config = Config(inverter_name='deye_2mppt', verbose=False)
+        parameters = get_parameter(config=config)
         self.assertIsInstance(parameters, list)
         example = parameters[0]
         self.assertEqual(

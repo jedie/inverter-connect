@@ -1,6 +1,7 @@
 from unittest import TestCase
 
-from inverter.connection import ModbusResponse, Parameter, parse_modbus_response
+from inverter.connection import parse_modbus_response
+from inverter.data_types import ModbusResponse, Parameter
 
 
 def get_parameter(**kwargs) -> Parameter:

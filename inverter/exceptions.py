@@ -25,3 +25,11 @@ class ParseModbusValueError(ReadInverterError):
 
 class ReadTimeout(ReadInverterError):
     pass
+
+
+class ValidationError(AssertionError):
+    """
+    A readed inverter value is not valid.
+    """
+
+    pass

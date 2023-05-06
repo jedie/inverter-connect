@@ -64,12 +64,17 @@ Usage: ./cli.py publish-loop [OPTIONS] IP
  AT-command.
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
-│ --port                    INTEGER RANGE [1000<=x<=65535]  Port of the inverter                   │
-│                                                           [default: 48899; 1000<=x<=65535]       │
-│ --log/--no-log                                            [default: log]                         │
-│ --verbose/--no-verbose                                    [default: verbose]                     │
-│ --debug/--no-debug                                        [default: no-debug]                    │
-│ --help                                                    Show this message and exit.            │
+│ *  --port                    INTEGER RANGE [1000<=x<=65535]  Port of the inverter                │
+│                                                              [default: 48899; 1000<=x<=65535]    │
+│                                                              [required]                          │
+│ *  --inverter                TEXT                            Prefix of yaml config files in      │
+│                                                              inverter/definitions/               │
+│                                                              [default: deye_2mppt]               │
+│                                                              [required]                          │
+│    --log/--no-log                                            [default: log]                      │
+│    --verbose/--no-verbose                                    [default: verbose]                  │
+│    --debug/--no-debug                                        [default: no-debug]                 │
+│    --help                                                    Show this message and exit.         │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 [comment]: <> (✂✂✂ auto generated publish-loop help end ✂✂✂)
@@ -90,10 +95,15 @@ Usage: ./cli.py print-values [OPTIONS] IP
  .../inverter-connect$ ./cli.py print-values 192.168.123.456
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
-│ --port                INTEGER RANGE [1000<=x<=65535]  Port of the inverter                       │
-│                                                       [default: 48899; 1000<=x<=65535]           │
-│ --debug/--no-debug                                    [default: no-debug]                        │
-│ --help                                                Show this message and exit.                │
+│    --port                    INTEGER RANGE [1000<=x<=65535]  Port of the inverter                │
+│                                                              [default: 48899; 1000<=x<=65535]    │
+│ *  --inverter                TEXT                            Prefix of yaml config files in      │
+│                                                              inverter/definitions/               │
+│                                                              [default: deye_2mppt]               │
+│                                                              [required]                          │
+│    --verbose/--no-verbose                                    [default: verbose]                  │
+│    --debug/--no-debug                                        [default: no-debug]                 │
+│    --help                                                    Show this message and exit.         │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 [comment]: <> (✂✂✂ auto generated print-values help end ✂✂✂)
@@ -127,10 +137,11 @@ Usage: ./cli.py print-at-commands [OPTIONS] IP [COMMANDS]...
  (Note: The prefix "AT+" will be added to every command)
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
-│ --port                INTEGER RANGE [1000<=x<=65535]  Port of the inverter                       │
-│                                                       [default: 48899; 1000<=x<=65535]           │
-│ --debug/--no-debug                                    [default: no-debug]                        │
-│ --help                                                Show this message and exit.                │
+│ --port                    INTEGER RANGE [1000<=x<=65535]  Port of the inverter                   │
+│                                                           [default: 48899; 1000<=x<=65535]       │
+│ --verbose/--no-verbose                                    [default: verbose]                     │
+│ --debug/--no-debug                                        [default: no-debug]                    │
+│ --help                                                    Show this message and exit.            │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 [comment]: <> (✂✂✂ auto generated print-at-commands help end ✂✂✂)
@@ -158,10 +169,11 @@ Usage: ./cli.py read-register [OPTIONS] IP REGISTER LENGTH
  The start address can be pass as decimal number or as hex string, e.g.: 0x123
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
-│ --port                INTEGER RANGE [1000<=x<=65535]  Port of the inverter                       │
-│                                                       [default: 48899; 1000<=x<=65535]           │
-│ --debug/--no-debug                                    [default: debug]                           │
-│ --help                                                Show this message and exit.                │
+│ --port                    INTEGER RANGE [1000<=x<=65535]  Port of the inverter                   │
+│                                                           [default: 48899; 1000<=x<=65535]       │
+│ --verbose/--no-verbose                                    [default: verbose]                     │
+│ --debug/--no-debug                                        [default: no-debug]                    │
+│ --help                                                    Show this message and exit.            │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 [comment]: <> (✂✂✂ auto generated read-register help end ✂✂✂)
