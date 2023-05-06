@@ -64,6 +64,9 @@ def publish_forever(*, mqtt_settings: MqttSettings, config: Config, verbose):
                         publisher.publish2homeassistant(ha_mqtt_payload=ha_mqtt_payload)
         except ReadTimeout as err:
             print(f'[red]{err}')
+        except BaseException as err:
+            print(f'[red]{err}')
+            logger.exception('Unexpected error: %s', err)
 
         print('Wait', end='...')
         for i in range(10, 1, -1):
