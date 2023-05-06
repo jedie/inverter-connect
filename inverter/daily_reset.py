@@ -1,21 +1,10 @@
-import dataclasses
 import logging
 from datetime import datetime
 
-from inverter.api import Inverter, InverterValue, set_current_time
-from inverter.config import Config
-
+from inverter.api import Inverter, set_current_time
+from inverter.data_types import Config, InverterValue, ResetState
 
 logger = logging.getLogger(__name__)
-
-
-@dataclasses.dataclass
-class ResetState:
-    started: datetime
-    set_time_count: int = 0
-    successful_count: int = 0
-    last_success_dt: datetime = None
-    reset_needed: bool = False
 
 
 class DailyProductionReset:

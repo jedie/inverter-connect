@@ -4,12 +4,11 @@ from datetime import datetime
 
 from rich import print  # noqa
 
-from inverter.api import Inverter, InverterValue
-from inverter.config import Config
-from inverter.connection import InverterInfo
+from inverter.api import Inverter
 from inverter.constants import ERROR_STR_NO_DATA
-from inverter.daily_reset import DailyProductionReset, ResetState
-from inverter.exceptions import ReadInverterError, ReadTimeout
+from inverter.daily_reset import DailyProductionReset
+from inverter.data_types import Config, InverterInfo, InverterValue, ResetState
+from inverter.exceptions import ReadInverterError, ReadTimeout, ValidationError
 from inverter.mqtt4homeassistant.converter import values2mqtt_payload
 from inverter.mqtt4homeassistant.data_classes import HaValue, HaValues, MqttSettings
 from inverter.mqtt4homeassistant.mqtt import HaMqttPublisher
@@ -50,6 +49,8 @@ def publish_forever(*, mqtt_settings: MqttSettings, config: Config, verbose):
                                     unit=value.unit,
                                 )
                             )
+                    except ValidationError as err:
+                        print(f'[red]Skip send values: {err}')
                     except ReadInverterError as err:
                         print(f'[red]{err}')
                     else:

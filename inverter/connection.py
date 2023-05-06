@@ -1,46 +1,17 @@
 from __future__ import annotations
 
-import dataclasses
 import logging
 import socket
 import time
 
 from rich import print  # noqa
 
-from inverter.config import Config
 from inverter.constants import AT_READ_FUNC_NUMBER, AT_WRITE_FUNC_NUMBER, ERROR_STR_NO_DATA
-from inverter.definitions import Parameter
+from inverter.data_types import Config, InverterInfo, ModbusReadResult, ModbusResponse, Parameter, RawModBusResponse
 from inverter.exceptions import CrcError, ModbusNoData, ModbusNoHexData, ParseModbusValueError, ReadTimeout
 
 
 logger = logging.getLogger(__name__)
-
-
-@dataclasses.dataclass
-class InverterInfo:
-    ip: str
-    mac: str
-    serial: int
-
-
-@dataclasses.dataclass
-class RawModBusResponse:
-    prefix: str
-    data: str
-
-
-@dataclasses.dataclass
-class ModbusResponse:
-    slave_id: int
-    modbus_function: int
-    data_hex: str
-
-
-@dataclasses.dataclass
-class ModbusReadResult:
-    parameter: Parameter
-    parsed_value: float | str
-    response: ModbusResponse = None
 
 
 def make_modbus_result(*, response: ModbusResponse, parameter: Parameter) -> ModbusReadResult:

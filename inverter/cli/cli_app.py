@@ -15,11 +15,10 @@ from rich_click import RichGroup
 
 import inverter
 from inverter import constants
-from inverter.api import Inverter, ValueType, set_current_time
-from inverter.config import Config
-from inverter.connection import InverterInfo, InverterSock
+from inverter.api import Inverter, set_current_time
+from inverter.connection import InverterSock
 from inverter.constants import ERROR_STR_NO_DATA
-from inverter.definitions import Parameter
+from inverter.data_types import Config, InverterInfo, Parameter, ValueType
 from inverter.mqtt4homeassistant.data_classes import MqttSettings
 from inverter.mqtt4homeassistant.mqtt import get_connected_client
 from inverter.publish_loop import publish_forever
@@ -53,6 +52,14 @@ ARGUMENT_EXISTING_FILE = dict(
     type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, path_type=Path)
 )
 
+INVERTER_NAME = dict(
+    required=True,
+    type=str,
+    default='deye_2mppt',
+    help='Prefix of yaml config files in inverter/definitions/',
+    show_default=True,
+)
+
 
 class ClickGroup(RichGroup):  # FIXME: How to set the "info_name" easier?
     def make_context(self, info_name, *args, **kwargs):
@@ -83,8 +90,10 @@ cli.add_command(version)
 @click.option(
     '--port', type=click.IntRange(1000, 65535), default=48899, help='Port of the inverter', show_default=True
 )
+@click.option('--inverter', **INVERTER_NAME)
+@click.option('--verbose/--no-verbose', **OPTION_ARGS_DEFAULT_TRUE)
 @click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
-def print_values(ip, port, debug):
+def print_values(ip, port, inverter, verbose, debug):
     """
     Print all known register values from Inverter, e.g.:
 
@@ -92,7 +101,7 @@ def print_values(ip, port, debug):
     """
     basic_log_setup(debug=debug)
 
-    config = Config(yaml_filename='deye_2mppt.yaml', host=ip, port=port, debug=debug)
+    config = Config(inverter_name=inverter, host=ip, port=port, verbose=verbose, debug=debug)
     with Inverter(config=config) as inverter:
         inverter_info: InverterInfo = inverter.inv_sock.inverter_info
         print(inverter_info)
@@ -130,8 +139,9 @@ cli.add_command(print_values)
 @click.option(
     '--port', type=click.IntRange(1000, 65535), default=48899, help='Port of the inverter', show_default=True
 )
+@click.option('--verbose/--no-verbose', **OPTION_ARGS_DEFAULT_TRUE)
 @click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
-def print_at_commands(ip, port, commands, debug):
+def print_at_commands(ip, port, commands, verbose, debug):
     """
     Print one or more AT command values from Inverter.
 
@@ -201,7 +211,7 @@ def print_at_commands(ip, port, commands, debug):
             'DEVSELCTL',  # Set/Get Web Device List Info
         )
 
-    config = Config(yaml_filename=None, host=ip, port=port, debug=debug)
+    config = Config(inverter_name=None, host=ip, port=port, verbose=verbose, debug=debug)
     if debug:
         print(config)
 
@@ -225,8 +235,9 @@ cli.add_command(print_at_commands)
     '--port', type=click.IntRange(1000, 65535), default=48899, help='Port of the inverter', show_default=True
 )
 @click.option('--register', default="0x16", help='Start address', show_default=True)
+@click.option('--verbose/--no-verbose', **OPTION_ARGS_DEFAULT_TRUE)
 @click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_TRUE)
-def set_time(ip, port, register, debug):
+def set_time(ip, port, register, verbose, debug):
     """
     Set current date time in the inverter device.
 
@@ -237,7 +248,7 @@ def set_time(ip, port, register, debug):
     """
     address = convert_address_option(raw_address=register, debug=debug)
 
-    config = Config(yaml_filename=None, host=ip, port=port, debug=debug)
+    config = Config(inverter_name=None, host=ip, port=port, verbose=verbose, debug=debug)
     if debug:
         print(config)
 
@@ -266,10 +277,11 @@ cli.add_command(set_time)
 @click.option(
     '--port', type=click.IntRange(1000, 65535), default=48899, help='Port of the inverter', show_default=True
 )
-@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_TRUE)
 @click.argument('register')
 @click.argument('length', type=click.IntRange(1, 100))
-def read_register(ip, port, register, length, debug):
+@click.option('--verbose/--no-verbose', **OPTION_ARGS_DEFAULT_TRUE)
+@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
+def read_register(ip, port, register, length, verbose, debug):
     """
     Read register(s) from the inverter
 
@@ -286,9 +298,7 @@ def read_register(ip, port, register, length, debug):
     print(f'Read {length} register(s) from {register=!r} ({ip}:{port})')
     address = convert_address_option(raw_address=register, debug=debug)
 
-    config = Config(yaml_filename=None, host=ip, port=port, debug=debug)
-    if debug:
-        print(config)
+    config = Config(inverter_name=None, host=ip, port=port, verbose=verbose, debug=debug)
 
     with InverterSock(config) as inv_sock:
         inverter_info: InverterInfo = inv_sock.inverter_info
@@ -380,12 +390,18 @@ cli.add_command(test_mqtt_connection)
 @click.command()
 @click.argument('ip')
 @click.option(
-    '--port', type=click.IntRange(1000, 65535), default=48899, help='Port of the inverter', show_default=True
+    '--port',
+    type=click.IntRange(1000, 65535),
+    default=48899,
+    help='Port of the inverter',
+    show_default=True,
+    required=True,
 )
+@click.option('--inverter', **INVERTER_NAME)
 @click.option('--log/--no-log', **OPTION_ARGS_DEFAULT_TRUE)
 @click.option('--verbose/--no-verbose', **OPTION_ARGS_DEFAULT_TRUE)
 @click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
-def publish_loop(ip, port, log, verbose, debug):
+def publish_loop(ip, port, inverter, log, verbose, debug):
     """
     Publish current data via MQTT for Home Assistant (endless loop)
 
@@ -395,7 +411,7 @@ def publish_loop(ip, port, log, verbose, debug):
     if log:
         basic_log_setup(debug=debug)
 
-    config = Config(yaml_filename='deye_2mppt.yaml', host=ip, port=port, debug=debug)
+    config = Config(inverter_name=inverter, host=ip, port=port, verbose=verbose, debug=debug)
 
     mqtt_settings: MqttSettings = get_mqtt_settings()
     pprint(mqtt_settings.anonymized())

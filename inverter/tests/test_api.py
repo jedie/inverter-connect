@@ -1,6 +1,7 @@
 from unittest import TestCase
 
-from inverter.api import InverterValue, ValueType, compute_values
+from inverter.api import compute_values
+from inverter.data_types import InverterValue, ValueType
 
 
 class ApiTestCase(TestCase):

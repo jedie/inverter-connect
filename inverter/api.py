@@ -1,35 +1,20 @@
 from __future__ import annotations
 
-import dataclasses
 import logging
 from collections.abc import Iterable
 from datetime import datetime
-from enum import Enum
 
 from rich import print  # noqa
+from rich.pretty import pprint
 
-from inverter.config import Config
-from inverter.connection import InverterSock, ModbusReadResult
+from inverter.connection import InverterSock
+from inverter.data_types import Config, InverterValue, ModbusReadResult, ValueType
 from inverter.definitions import get_parameter
+from inverter.exceptions import ValidationError
+from inverter.validators import InverterValueValidator
 
 
 logger = logging.getLogger(__name__)
-
-
-class ValueType(Enum):
-    READ_OUT = 'read out'
-    COMPUTED = 'computed'
-
-
-@dataclasses.dataclass
-class InverterValue:
-    type: ValueType
-    name: str
-    value: float | str
-    device_class: str  # e.g.: "voltage" / "current" / "energy" etc.
-    state_class: str | None  # e.g.: "measurement" / "total" / "total_increasing" etc.
-    unit: str  # e.g.: "V" / "A" / "kWh" etc.
-    result: ModbusReadResult | None
 
 
 def compute_values(values: dict) -> Iterable[InverterValue]:
@@ -87,7 +72,8 @@ def compute_values(values: dict) -> Iterable[InverterValue]:
 class Inverter:
     def __init__(self, config: Config):
         self.config = config
-        self.parameters = get_parameter(yaml_filename=config.yaml_filename, debug=config.debug)
+        self.parameters = get_parameter(config=config)
+        self.value_validator = InverterValueValidator(config=config)
         self.inv_sock = InverterSock(config)
 
     def __enter__(self):
@@ -119,6 +105,15 @@ class Inverter:
                 unit=parameter.unit,
                 result=result,
             )
+            if self.config.debug:
+                pprint(value, indent_guides=False)
+
+            try:
+                self.value_validator(inverter_value=value)
+            except ValidationError as err:
+                logger.info(f'Validation error: {err}')
+                raise
+
             assert name not in values, f'Double {name=}: {value=} - {values=}'
             values[name] = value
             yield value
