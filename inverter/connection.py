@@ -198,7 +198,7 @@ class InverterSock:
 
         try:
             data = self.sock.recv(buffer_size)
-        except TimeoutError as err:
+        except (TimeoutError, socket.timeout) as err:
             raise ReadTimeout(f'Get no response from {self.config.host}: {err}')
         else:
             if self.config.debug:
