@@ -18,7 +18,8 @@ from inverter import constants
 from inverter.api import Inverter, set_current_time
 from inverter.connection import InverterSock
 from inverter.constants import ERROR_STR_NO_DATA
-from inverter.data_types import Config, InverterInfo, Parameter, ValueType
+from inverter.data_types import Config, Parameter, ValueType
+from inverter.exceptions import ReadInverterError
 from inverter.mqtt4homeassistant.data_classes import MqttSettings
 from inverter.mqtt4homeassistant.mqtt import get_connected_client
 from inverter.publish_loop import publish_forever
@@ -102,10 +103,13 @@ def print_values(ip, port, inverter, verbose, debug):
     basic_log_setup(debug=debug)
 
     config = Config(inverter_name=inverter, host=ip, port=port, verbose=verbose, debug=debug)
+
     with Inverter(config=config) as inverter:
-        inverter_info: InverterInfo = inverter.inv_sock.inverter_info
-        print(inverter_info)
-        print()
+        try:
+            inverter.connect()
+        except ReadInverterError as err:
+            print(f'[red]{err}')
+            sys.exit(1)
 
         for value in inverter:
             print(f'\t* [yellow]{value.name:<31}[/yellow]:', end=' ')
@@ -212,13 +216,13 @@ def print_at_commands(ip, port, commands, verbose, debug):
         )
 
     config = Config(inverter_name=None, host=ip, port=port, verbose=verbose, debug=debug)
-    if debug:
-        print(config)
 
     with InverterSock(config) as inv_sock:
-        inverter_info: InverterInfo = inv_sock.inverter_info
-        print(inverter_info)
-        print()
+        try:
+            inv_sock.connect()
+        except ReadInverterError as err:
+            print(f'[red]{err}')
+            sys.exit(1)
 
         for command in commands:
             print(f'\t* [grey]AT+[/grey][bold][yellow]{command:<10}[/yellow]:', end=' ')
@@ -249,13 +253,13 @@ def set_time(ip, port, register, verbose, debug):
     address = convert_address_option(raw_address=register, debug=debug)
 
     config = Config(inverter_name=None, host=ip, port=port, verbose=verbose, debug=debug)
-    if debug:
-        print(config)
 
     with InverterSock(config) as inv_sock:
-        inverter_info: InverterInfo = inv_sock.inverter_info
-        print(inverter_info)
-        print()
+        try:
+            inv_sock.connect()
+        except ReadInverterError as err:
+            print(f'[red]{err}')
+            sys.exit(1)
 
         set_current_time(inv_sock=inv_sock, address=address, verbose=True)
 
@@ -301,9 +305,12 @@ def read_register(ip, port, register, length, verbose, debug):
     config = Config(inverter_name=None, host=ip, port=port, verbose=verbose, debug=debug)
 
     with InverterSock(config) as inv_sock:
-        inverter_info: InverterInfo = inv_sock.inverter_info
-        print(inverter_info)
-        print()
+        try:
+            inv_sock.connect()
+        except ReadInverterError as err:
+            print(f'[red]{err}')
+            sys.exit(1)
+
         print_register(inv_sock, start_register=address, length=length)
 
 

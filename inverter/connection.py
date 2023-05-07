@@ -8,7 +8,14 @@ from rich import print  # noqa
 
 from inverter.constants import AT_READ_FUNC_NUMBER, AT_WRITE_FUNC_NUMBER, ERROR_STR_NO_DATA
 from inverter.data_types import Config, InverterInfo, ModbusReadResult, ModbusResponse, Parameter, RawModBusResponse
-from inverter.exceptions import CrcError, ModbusNoData, ModbusNoHexData, ParseModbusValueError, ReadTimeout
+from inverter.exceptions import (
+    CrcError,
+    ModbusNoData,
+    ModbusNoHexData,
+    ParseModbusValueError,
+    ReadInverterError,
+    ReadTimeout,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -167,23 +174,40 @@ class InverterSock:
     def __init__(self, config: Config):
         self.config = config
 
+        self.sock = None
         self.dock = None
         self.inverter_info = None
 
-    def __enter__(self):
+    def __enter__(self) -> InverterSock:
+        return self
+
+    def init_inventer(self) -> None:
+        data = self.recv_command(command=self.config.init_cmd)
+        self.send(command=b'+ok')
+        data = data.decode()
+        data = data.split(',')
+        self.inverter_info = InverterInfo(ip=data[0], mac=data[1], serial=int(data[2]))
+
+        print(self.inverter_info)
+        print()
+
+    def connect(self) -> None:
+        assert self.sock is None
         logger.info(f'Connect to {self.config.host}:{self.config.port}...')
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.settimeout(self.config.timeout)
 
-        self.inverter_info = self.init_inventer()
-
-        return self
+        self.init_inventer()
 
     def send(self, *, command: bytes):
         if self.config.debug:
             print(f'send: {command}', end='...', flush=True)
-        self.sock.sendto(command, (self.config.host, self.config.port))
+
+        try:
+            self.sock.sendto(command, (self.config.host, self.config.port))
+        except socket.gaierror as err:
+            raise ReadInverterError(f'{err} (Hint: Check {self.config.host}:{self.config.port})')
 
         if self.config.debug:
             print('OK', flush=True)
@@ -235,18 +259,12 @@ class InverterSock:
         return raw_modbus_response.data
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        print('\nSigning off with "AT+Q"', end='...')
-        self.send(command=b'AT+Q\n')
-        print('Goodbye ;)\n')
         if exc_type:
             return False
 
-    def init_inventer(self):
-        data = self.recv_command(command=self.config.init_cmd)
-        self.send(command=b'+ok')
-        data = data.decode()
-        data = data.split(',')
-        return InverterInfo(ip=data[0], mac=data[1], serial=int(data[2]))
+        print('\nSigning off with "AT+Q"', end='...')
+        self.send(command=b'AT+Q\n')
+        print('Goodbye ;)\n')
 
     def read(self, *, start_register: int, length: int) -> ModbusResponse:
         if self.config.debug:

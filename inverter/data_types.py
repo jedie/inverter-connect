@@ -91,7 +91,7 @@ class Config:
                     f'Wrong inverter name: {self.inverter_name!r}: File not found: {self.validation_file_path}'
                 )
 
-        if self.verbose:
+        if self.verbose or self.debug:
             print(self)
 
 

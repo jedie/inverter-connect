@@ -25,10 +25,10 @@ def publish_forever(*, mqtt_settings: MqttSettings, config: Config, verbose):
     while True:
         try:
             with Inverter(config=config) as inverter:
+                inverter.connect()
+                inverter_info: InverterInfo = inverter.inv_sock.inverter_info
+
                 with DailyProductionReset(reset_state, inverter, config) as daily_production_reset:
-                    inverter_info: InverterInfo = inverter.inv_sock.inverter_info
-                    print(inverter_info)
-                    print()
 
                     try:
                         values = []
