@@ -80,6 +80,9 @@ class Inverter:
         self.inv_sock.__enter__()
         return self
 
+    def connect(self) -> None:
+        self.inv_sock.connect()
+
     def __iter__(self) -> Iterable[InverterValue]:
         values = {}
         for parameter in self.parameters:
