@@ -16,3 +16,5 @@ TYPE_MAP = {
     'float': float,
     'int': int,
 }
+
+USER_SETTINGS_PATH = '~/.inverter-connect.toml'

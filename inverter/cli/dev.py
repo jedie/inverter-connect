@@ -6,16 +6,21 @@ import sys
 from pathlib import Path
 
 import rich_click as click
+import tomlkit
 from bx_py_utils.path import assert_is_file
+from ha_services.toml_settings.serialize import dataclass2toml
 from manageprojects.utilities import code_style
 from manageprojects.utilities.publish import publish_package
 from manageprojects.utilities.subprocess_utils import verbose_check_call
 from manageprojects.utilities.version_info import print_version
 from rich import print  # noqa; noqa
 from rich_click import RichGroup
+from tomlkit import TOMLDocument
 
 import inverter
 from inverter import constants
+from inverter.constants import USER_SETTINGS_PATH
+from inverter.user_settings import UserSettings
 
 
 logger = logging.getLogger(__name__)
@@ -300,6 +305,29 @@ def version():
 
 
 cli.add_command(version)
+
+
+######################################################################################################
+@click.command()
+def create_default_settings():
+    """
+    Create a default user settings file. (Used by CI pipeline ;)
+    """
+    settings_path = Path(USER_SETTINGS_PATH).expanduser()
+    if settings_path.is_file():
+        print(f'[green]Use settings file already exists here: {settings_path}')
+        return
+
+    document: TOMLDocument = dataclass2toml(instance=UserSettings())
+    doc_str = tomlkit.dumps(document, sort_keys=False)
+
+    settings_path.write_text(doc_str, encoding='UTF-8')
+    print(f'[green]Default settings file created here: {settings_path}')
+
+
+cli.add_command(create_default_settings)
+
+######################################################################################################
 
 
 def main():

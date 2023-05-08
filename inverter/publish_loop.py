@@ -2,6 +2,9 @@ import logging
 import time
 from datetime import datetime
 
+from ha_services.mqtt4homeassistant.converter import values2mqtt_payload
+from ha_services.mqtt4homeassistant.data_classes import HaValue, HaValues
+from ha_services.mqtt4homeassistant.mqtt import HaMqttPublisher
 from rich import print  # noqa
 
 from inverter.api import Inverter
@@ -9,16 +12,18 @@ from inverter.constants import ERROR_STR_NO_DATA
 from inverter.daily_reset import DailyProductionReset
 from inverter.data_types import Config, InverterInfo, InverterValue, ResetState
 from inverter.exceptions import ReadInverterError, ReadTimeout, ValidationError
-from inverter.mqtt4homeassistant.converter import values2mqtt_payload
-from inverter.mqtt4homeassistant.data_classes import HaValue, HaValues, MqttSettings
-from inverter.mqtt4homeassistant.mqtt import HaMqttPublisher
+from inverter.utilities.cli import exit_with_human_error
 
 
 logger = logging.getLogger(__name__)
 
 
-def publish_forever(*, mqtt_settings: MqttSettings, config: Config, verbose):
-    publisher = HaMqttPublisher(settings=mqtt_settings, verbose=verbose, config_count=1)
+def publish_forever(*, config: Config, verbosity):
+    mqtt_settings = config.mqtt_settings
+    try:
+        publisher = HaMqttPublisher(settings=mqtt_settings, verbose=bool(verbosity), config_count=1)
+    except Exception as err:
+        exit_with_human_error(hint=f'given {mqtt_settings!r} is wrong?!?', print_traceback=err)
 
     reset_state = ResetState(started=datetime.now())
 

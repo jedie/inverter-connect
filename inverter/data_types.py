@@ -1,15 +1,20 @@
 from __future__ import annotations
 
 import dataclasses
+import logging
 from datetime import datetime, time
 from enum import Enum
 from pathlib import Path
 from typing import Callable
 
 import msgspec
+from ha_services.mqtt4homeassistant.data_classes import MqttSettings
 from rich import print
 
 from inverter.constants import BASE_PATH, TYPE_MAP
+
+
+logger = logging.getLogger(__name__)
 
 
 class ValueType(Enum):
@@ -57,17 +62,17 @@ class ModbusReadResult:
 
 @dataclasses.dataclass
 class Config:
-    inverter_name: str | None
+    verbosity: int
+    host: str
+    port: int
+    mqtt_settings: MqttSettings
 
-    host: str | None = None
-    port: int = 48899
+    inverter_name: str | None
 
     pause: float = 0.1
     timeout: int = 5
 
     init_cmd: bytes = b'WIFIKIT-214028-READ'
-    verbose: bool = True
-    debug: bool = False
 
     daily_production_name: str = 'Daily Production'  # Must be the same as in yaml config!
     reset_needed_start: time = time(hour=1)
@@ -91,7 +96,7 @@ class Config:
                     f'Wrong inverter name: {self.inverter_name!r}: File not found: {self.validation_file_path}'
                 )
 
-        if self.verbose or self.debug:
+        if self.verbosity > 1:
             print(self)
 
 

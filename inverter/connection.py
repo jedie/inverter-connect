@@ -201,7 +201,7 @@ class InverterSock:
         self.init_inventer()
 
     def send(self, *, command: bytes):
-        if self.config.debug:
+        if self.config.verbosity > 1:
             print(f'send: {command}', end='...', flush=True)
 
         try:
@@ -209,7 +209,7 @@ class InverterSock:
         except socket.gaierror as err:
             raise ReadInverterError(f'{err} (Hint: Check {self.config.host}:{self.config.port})')
 
-        if self.config.debug:
+        if self.config.verbosity > 1:
             print('OK', flush=True)
 
         time.sleep(self.config.pause)
@@ -217,7 +217,7 @@ class InverterSock:
     def recv_command(self, *, command: bytes, buffer_size=1024):
         self.send(command=command)
 
-        if self.config.debug:
+        if self.config.verbosity > 1:
             print('recv', end='...', flush=True)
 
         try:
@@ -225,7 +225,7 @@ class InverterSock:
         except (TimeoutError, socket.timeout) as err:
             raise ReadTimeout(f'Get no response from {self.config.host}: {err}')
         else:
-            if self.config.debug:
+            if self.config.verbosity > 1:
                 print(f'{data}', flush=True)
 
             return data
@@ -267,7 +267,7 @@ class InverterSock:
         print('Goodbye ;)\n')
 
     def read(self, *, start_register: int, length: int) -> ModbusResponse:
-        if self.config.debug:
+        if self.config.verbosity > 1:
             print(f'Read {length} value(s) from start register: {hex(start_register)}')
 
         command = parameter2modbus_at_command(
@@ -275,7 +275,7 @@ class InverterSock:
             length=length,
             modbus_function=AT_READ_FUNC_NUMBER,
         )
-        if self.config.debug:
+        if self.config.verbosity > 1:
             print(f'AT command: {command}')
 
         data: str = self.cleaned_at_command(command=command)
@@ -286,7 +286,7 @@ class InverterSock:
         return response
 
     def read_paremeter(self, *, parameter: Parameter) -> ModbusReadResult:
-        if self.config.debug:
+        if self.config.verbosity > 1:
             print(parameter)
 
         try:
@@ -302,7 +302,7 @@ class InverterSock:
         return result
 
     def write(self, *, address: int, values: list[int, ...]):
-        if self.config.debug:
+        if self.config.verbosity > 1:
             print(f'Write {" ".join(hex(value) for value in values)} to {hex(address)}')
 
         command = parameter2modbus_at_command(
@@ -311,7 +311,7 @@ class InverterSock:
             modbus_function=AT_WRITE_FUNC_NUMBER,
             values=values,
         )
-        if self.config.debug:
+        if self.config.verbosity > 1:
             print(f'AT command: {command}')
 
         data: str = self.cleaned_at_command(command=command)

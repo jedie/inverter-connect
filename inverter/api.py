@@ -108,7 +108,7 @@ class Inverter:
                 unit=parameter.unit,
                 result=result,
             )
-            if self.config.debug:
+            if self.config.verbosity > 1:
                 pprint(value, indent_guides=False)
 
             try:
