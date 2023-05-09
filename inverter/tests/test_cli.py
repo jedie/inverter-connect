@@ -11,13 +11,17 @@ class CliTestCase(BaseTestCase):
             invoke_click(
                 cli,
                 'print-at-commands',
+                '--ip',
                 '123.456.789.666',  # <<< not a valid IPv4 -> socket.gaierror will be raised
             )
 
         result: Result = cm.exception.result
         self.assert_in_content(
             got=result.stdout,
-            parts=('[Errno -2]', '(Hint: Check 123.456.789.666:48899)'),
+            parts=(
+                'gaierror: [Errno -2]',
+                "Is the given ip='123.456.789.666' is wrong?!?",
+            ),
         )
 
     def test_print_values_invalid_ip(self):
@@ -25,11 +29,15 @@ class CliTestCase(BaseTestCase):
             invoke_click(
                 cli,
                 'print-values',
+                '--ip',
                 '123.456.789.666',  # <<< not a valid IPv4 -> socket.gaierror will be raised
             )
 
         result: Result = cm.exception.result
         self.assert_in_content(
             got=result.stdout,
-            parts=('[Errno -2]', '(Hint: Check 123.456.789.666:48899)'),
+            parts=(
+                'gaierror: [Errno -2]',
+                "Is the given ip='123.456.789.666' is wrong?!?",
+            ),
         )

@@ -5,7 +5,8 @@ from unittest import TestCase
 from freezegun import freeze_time
 
 from inverter.daily_reset import DailyProductionReset
-from inverter.data_types import Config, InverterValue, ResetState, ValueType
+from inverter.data_types import InverterValue, ResetState, ValueType
+from inverter.tests import fixtures
 
 
 class DailyProductionResetTestCase(TestCase):
@@ -26,7 +27,7 @@ class DailyProductionResetTestCase(TestCase):
                 self.writes.append((address, values))
 
         inverter = InverterMock()
-        config = Config(inverter_name=None, verbose=False)
+        config = fixtures.get_config()
 
         with DailyProductionReset(reset_state, inverter, config) as daily_production_reset:
             self.assertEqual(

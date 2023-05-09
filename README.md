@@ -13,6 +13,13 @@ The whole thing is just a learning exercise for now. We will see.
 
 # quickstart
 
+## overview
+
+* clone the sources
+* Bootstrap and create default user settings by just call `./cli.py edit-settings`
+* Change the settings for your needs
+* ...use the commands... ;)
+
 Currently just clone the project and just start the cli (that will create a virtualenv and installs every dependencies)
 
 Note: Please enable https://www.piwheels.org/ if you are on a Raspberry Pi !
@@ -35,12 +42,12 @@ Usage: ./cli.py [OPTIONS] COMMAND [ARGS]...
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────╮
 │ debug-settings           Display (anonymized) MQTT server username and password                  │
+│ edit-settings            Edit the settings file. On first call: Create the default one.          │
 │ print-at-commands        Print one or more AT command values from Inverter.                      │
 │ print-values             Print all known register values from Inverter, e.g.:                    │
 │ publish-loop             Publish current data via MQTT for Home Assistant (endless loop)         │
 │ read-register            Read register(s) from the inverter                                      │
 │ set-time                 Set current date time in the inverter device.                           │
-│ store-settings           Store MQTT server settings.                                             │
 │ test-mqtt-connection     Test connection to MQTT Server                                          │
 │ version                  Print version and exit                                                  │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
@@ -57,24 +64,24 @@ Help from `./cli.py print-values --help` Looks like:
 
 [comment]: <> (✂✂✂ auto generated publish-loop help start ✂✂✂)
 ```
-Usage: ./cli.py publish-loop [OPTIONS] IP
+Usage: ./cli.py publish-loop [OPTIONS]
 
  Publish current data via MQTT for Home Assistant (endless loop)
  The "Daily Production" count will be cleared in the night, by set the current date time via
  AT-command.
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
-│ *  --port                    INTEGER RANGE [1000<=x<=65535]  Port of the inverter                │
-│                                                              [default: 48899; 1000<=x<=65535]    │
-│                                                              [required]                          │
-│ *  --inverter                TEXT                            Prefix of yaml config files in      │
-│                                                              inverter/definitions/               │
-│                                                              [default: deye_2mppt]               │
-│                                                              [required]                          │
-│    --log/--no-log                                            [default: log]                      │
-│    --verbose/--no-verbose                                    [default: verbose]                  │
-│    --debug/--no-debug                                        [default: no-debug]                 │
-│    --help                                                    Show this message and exit.         │
+│ *  --ip             TEXT                     IP address of your inverter [required]              │
+│ *  --port           INTEGER                  Port of inverter services [default: 48899]          │
+│                                              [required]                                          │
+│ *  --inverter       TEXT                     Prefix of yaml config files in                      │
+│                                              inverter/definitions/                               │
+│                                              [default: deye_2mppt]                               │
+│                                              [required]                                          │
+│    --verbosity  -v  INTEGER RANGE [0<=x<=3]  Verbosity level; Accepts integer value e.g.:        │
+│                                              "--verbose 2" or can be count e.g.: "-vv"           │
+│                                              [default: 1; 0<=x<=3]                               │
+│    --help                                    Show this message and exit.                         │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 [comment]: <> (✂✂✂ auto generated publish-loop help end ✂✂✂)
@@ -89,21 +96,23 @@ Help from `./cli.py print-values --help` Looks like:
 
 [comment]: <> (✂✂✂ auto generated print-values help start ✂✂✂)
 ```
-Usage: ./cli.py print-values [OPTIONS] IP
+Usage: ./cli.py print-values [OPTIONS]
 
  Print all known register values from Inverter, e.g.:
  .../inverter-connect$ ./cli.py print-values 192.168.123.456
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
-│    --port                    INTEGER RANGE [1000<=x<=65535]  Port of the inverter                │
-│                                                              [default: 48899; 1000<=x<=65535]    │
-│ *  --inverter                TEXT                            Prefix of yaml config files in      │
-│                                                              inverter/definitions/               │
-│                                                              [default: deye_2mppt]               │
-│                                                              [required]                          │
-│    --verbose/--no-verbose                                    [default: verbose]                  │
-│    --debug/--no-debug                                        [default: no-debug]                 │
-│    --help                                                    Show this message and exit.         │
+│ *  --ip             TEXT                     IP address of your inverter [required]              │
+│ *  --port           INTEGER                  Port of inverter services [default: 48899]          │
+│                                              [required]                                          │
+│ *  --inverter       TEXT                     Prefix of yaml config files in                      │
+│                                              inverter/definitions/                               │
+│                                              [default: deye_2mppt]                               │
+│                                              [required]                                          │
+│    --verbosity  -v  INTEGER RANGE [0<=x<=3]  Verbosity level; Accepts integer value e.g.:        │
+│                                              "--verbose 2" or can be count e.g.: "-vv"           │
+│                                              [default: 1; 0<=x<=3]                               │
+│    --help                                    Show this message and exit.                         │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 [comment]: <> (✂✂✂ auto generated print-values help end ✂✂✂)
@@ -121,7 +130,7 @@ Help from `./cli.py print-at-commands --help` Looks like:
 
 [comment]: <> (✂✂✂ auto generated print-at-commands help start ✂✂✂)
 ```
-Usage: ./cli.py print-at-commands [OPTIONS] IP [COMMANDS]...
+Usage: ./cli.py print-at-commands [OPTIONS] [COMMANDS]...
 
  Print one or more AT command values from Inverter.
  Use all known AT commands, if no one is given, e.g.:
@@ -137,11 +146,13 @@ Usage: ./cli.py print-at-commands [OPTIONS] IP [COMMANDS]...
  (Note: The prefix "AT+" will be added to every command)
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
-│ --port                    INTEGER RANGE [1000<=x<=65535]  Port of the inverter                   │
-│                                                           [default: 48899; 1000<=x<=65535]       │
-│ --verbose/--no-verbose                                    [default: verbose]                     │
-│ --debug/--no-debug                                        [default: no-debug]                    │
-│ --help                                                    Show this message and exit.            │
+│ *  --ip             TEXT                     IP address of your inverter [required]              │
+│ *  --port           INTEGER                  Port of inverter services [default: 48899]          │
+│                                              [required]                                          │
+│    --verbosity  -v  INTEGER RANGE [0<=x<=3]  Verbosity level; Accepts integer value e.g.:        │
+│                                              "--verbose 2" or can be count e.g.: "-vv"           │
+│                                              [default: 1; 0<=x<=3]                               │
+│    --help                                    Show this message and exit.                         │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 [comment]: <> (✂✂✂ auto generated print-at-commands help end ✂✂✂)
@@ -159,7 +170,7 @@ Help from `./cli.py read-register --help` Looks like:
 
 [comment]: <> (✂✂✂ auto generated read-register help start ✂✂✂)
 ```
-Usage: ./cli.py read-register [OPTIONS] IP REGISTER LENGTH
+Usage: ./cli.py read-register [OPTIONS] REGISTER LENGTH
 
  Read register(s) from the inverter
  e.g.: read 3 registers starting from 0x16:
@@ -169,11 +180,13 @@ Usage: ./cli.py read-register [OPTIONS] IP REGISTER LENGTH
  The start address can be pass as decimal number or as hex string, e.g.: 0x123
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
-│ --port                    INTEGER RANGE [1000<=x<=65535]  Port of the inverter                   │
-│                                                           [default: 48899; 1000<=x<=65535]       │
-│ --verbose/--no-verbose                                    [default: verbose]                     │
-│ --debug/--no-debug                                        [default: no-debug]                    │
-│ --help                                                    Show this message and exit.            │
+│ *  --ip             TEXT                     IP address of your inverter [required]              │
+│ *  --port           INTEGER                  Port of inverter services [default: 48899]          │
+│                                              [required]                                          │
+│    --verbosity  -v  INTEGER RANGE [0<=x<=3]  Verbosity level; Accepts integer value e.g.:        │
+│                                              "--verbose 2" or can be count e.g.: "-vv"           │
+│                                              [default: 1; 0<=x<=3]                               │
+│    --help                                    Show this message and exit.                         │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 [comment]: <> (✂✂✂ auto generated read-register help end ✂✂✂)
@@ -204,6 +217,7 @@ Usage: ./dev-cli.py [OPTIONS] COMMAND [ARGS]...
 ╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────╮
 │ check-code-style            Check code style by calling darker + flake8                          │
 │ coverage                    Run and show coverage.                                               │
+│ create-default-settings     Create a default user settings file. (Used by CI pipeline ;)         │
 │ fix-code-style              Fix code style of all inverter source code files via darker          │
 │ install                     Run pip-sync and install 'inverter' via pip as editable.             │
 │ mypy                        Run Mypy (configured in pyproject.toml)                              │

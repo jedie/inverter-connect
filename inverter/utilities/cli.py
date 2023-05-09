@@ -1,6 +1,12 @@
+from __future__ import annotations
+
+import sys
+
 from bx_py_utils.iteration import chunk_iterable
 from rich import print  # noqa
 from rich.console import Console
+from rich.highlighter import ReprHighlighter
+from rich.panel import Panel
 from rich.table import Table
 
 from inverter.data_types import ModbusResponse
@@ -65,3 +71,43 @@ def print_register(inv_sock, start_register, length):
             data_hex=response.data_hex,
             title=f'[green][bold]{length} value(s) from {hex(start_register)}',
         )
+
+
+def exit_with_human_error(
+    *,
+    hint: str,
+    title='Hint',
+    exit_code=-1,
+    print_traceback: BaseException | None = None,
+    HintHighlighterClass=ReprHighlighter,
+    hint_border_style='bright_yellow',
+    hint_padding=(2, 5),
+):
+    """
+    TODO: Move to a shared package!
+    """
+    console = Console()
+    console.print('\n')
+
+    if print_traceback is not None:
+        assert isinstance(print_traceback, BaseException), f'Not a exception: {print_traceback!r}'
+        console.print_exception(show_locals=True)
+
+    console.print()
+
+    if HintHighlighterClass is not None:
+        highlighter = HintHighlighterClass()
+        hint = highlighter(text=hint)
+
+    console.print(
+        Panel(
+            hint,
+            title=f'[bright][green]{title}',
+            border_style=hint_border_style,
+            expand=False,
+            padding=hint_padding,
+        )
+    )
+    console.print()
+
+    sys.exit(exit_code)

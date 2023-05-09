@@ -1,13 +1,15 @@
 from unittest import TestCase
 
-from inverter.data_types import Config, Parameter
+from inverter.data_types import Parameter
 from inverter.definitions import get_definition, get_parameter
+from inverter.tests import fixtures
 from inverter.utilities.modbus_converter import parse_number
 
 
 class DefinitionsTestCase(TestCase):
     def test_get_definition(self):
-        config = Config(inverter_name='deye_2mppt', verbose=False)
+        config = fixtures.get_config()
+
         result = get_definition(config=config)
         self.assertIsInstance(result, list)
         example = result[0]['items'][0]
@@ -26,7 +28,8 @@ class DefinitionsTestCase(TestCase):
         )
 
     def test_get_parameter(self):
-        config = Config(inverter_name='deye_2mppt', verbose=False)
+        config = fixtures.get_config()
+
         parameters = get_parameter(config=config)
         self.assertIsInstance(parameters, list)
         example = parameters[0]

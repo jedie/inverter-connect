@@ -1,14 +1,15 @@
 import logging
 from unittest import TestCase
 
-from inverter.data_types import Config, InverterValue, ValueType
+from inverter.data_types import InverterValue, ValueType
 from inverter.exceptions import ValidationError
+from inverter.tests import fixtures
 from inverter.validators import InverterValueValidator
 
 
 class ValidatorsTestCase(TestCase):
     def test_happy_path(self):
-        config = Config(inverter_name='deye_2mppt', verbose=False)
+        config = fixtures.get_config()
         validator = InverterValueValidator(config=config)
 
         with self.assertLogs(logger=None, level=logging.DEBUG) as logs:

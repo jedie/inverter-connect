@@ -1,0 +1,18 @@
+# User settings for inverter-connect
+
+[mqtt]
+# MQTT server settings.
+host = "my-mosquitto.tld"
+port = 1883
+user_name = "test-user"
+password = "NoSecurePassword"
+
+[inverter]
+# The "name" is the prefix of "inverter/definitions/*.yaml" files!
+# 
+# Set "ip" of the inverter if it's always the same. (Hint: Pin it in FritzBox settings ;)
+# You can leave it empty, but then you must always pass "--ip" to CLI commands.
+# Even if it is specified here, you can always override it in the CLI with "--ip".
+name = "deye_2mppt"
+ip = ""
+port = 48899

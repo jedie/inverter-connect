@@ -1,7 +1,7 @@
 """
     CLI for usage
 """
-import getpass
+
 import logging
 import sys
 import time
@@ -9,23 +9,23 @@ from pathlib import Path
 
 import rich_click as click
 from bx_py_utils.path import assert_is_file
+from ha_services.mqtt4homeassistant.mqtt import get_connected_client
+from ha_services.toml_settings.api import debug_print_user_settings, edit_user_settings, get_user_settings
+from ha_services.toml_settings.exceptions import UserSettingsNotFound
 from rich import print  # noqa
-from rich.pretty import pprint
 from rich_click import RichGroup
 
 import inverter
 from inverter import constants
 from inverter.api import Inverter, set_current_time
 from inverter.connection import InverterSock
-from inverter.constants import ERROR_STR_NO_DATA
-from inverter.data_types import Config, Parameter, ValueType
+from inverter.constants import ERROR_STR_NO_DATA, USER_SETTINGS_PATH
+from inverter.data_types import Parameter, ValueType
 from inverter.exceptions import ReadInverterError
-from inverter.mqtt4homeassistant.data_classes import MqttSettings
-from inverter.mqtt4homeassistant.mqtt import get_connected_client
 from inverter.publish_loop import publish_forever
+from inverter.user_settings import UserSettings, make_config, migrate_old_settings
 from inverter.utilities.cli import convert_address_option, print_register
-from inverter.utilities.credentials import get_mqtt_settings, store_mqtt_settings
-from inverter.utilities.log_setup import basic_log_setup
+from inverter.verbosity import OPTION_KWARGS_VERBOSE, setup_logging
 
 
 logger = logging.getLogger(__name__)
@@ -53,14 +53,6 @@ ARGUMENT_EXISTING_FILE = dict(
     type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, path_type=Path)
 )
 
-INVERTER_NAME = dict(
-    required=True,
-    type=str,
-    default='deye_2mppt',
-    help='Prefix of yaml config files in inverter/definitions/',
-    show_default=True,
-)
-
 
 class ClickGroup(RichGroup):  # FIXME: How to set the "info_name" easier?
     def make_context(self, info_name, *args, **kwargs):
@@ -76,6 +68,9 @@ def cli():
     pass
 
 
+######################################################################################################
+
+
 @click.command()
 def version():
     """Print version and exit"""
@@ -86,23 +81,102 @@ def version():
 cli.add_command(version)
 
 
-@click.command()
-@click.argument('ip')
-@click.option(
-    '--port', type=click.IntRange(1000, 65535), default=48899, help='Port of the inverter', show_default=True
+######################################################################################################
+# User settings
+
+
+migrate_old_settings()  # TODO: Remove in the Future
+
+try:
+    user_settings: UserSettings = get_user_settings(user_settings=UserSettings(), settings_path=USER_SETTINGS_PATH)
+except UserSettingsNotFound:
+    print(f'[red]No settings file found: [yellow]{USER_SETTINGS_PATH}')
+    input('Press any key, to create it')
+    edit_user_settings(user_settings=UserSettings(), settings_path=USER_SETTINGS_PATH)
+    sys.exit(1)
+
+
+option_kwargs_ip = dict(
+    required=True,
+    type=str,
+    help='IP address of your inverter',
+    default=user_settings.inverter.ip or None,  # Don't accept empty string as IP: We need a address ;)
+    show_default=True,
 )
-@click.option('--inverter', **INVERTER_NAME)
-@click.option('--verbose/--no-verbose', **OPTION_ARGS_DEFAULT_TRUE)
-@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
-def print_values(ip, port, inverter, verbose, debug):
+option_kwargs_port = dict(
+    required=True,
+    type=int,
+    default=user_settings.inverter.port,
+    help='Port of inverter services',
+    show_default=True,
+)
+option_kwargs_inverter_name = dict(
+    required=True,
+    type=str,
+    default=user_settings.inverter.name,
+    help='Prefix of yaml config files in inverter/definitions/',
+    show_default=True,
+)
+
+
+@click.command()
+@click.option('-v', '--verbosity', **OPTION_KWARGS_VERBOSE)
+def edit_settings(verbosity: int):
+    """
+    Edit the settings file. On first call: Create the default one.
+    """
+    setup_logging(verbosity=verbosity)
+    edit_user_settings(user_settings=UserSettings(), settings_path=USER_SETTINGS_PATH)
+
+
+cli.add_command(edit_settings)
+
+
+@click.command()
+@click.option('-v', '--verbosity', **OPTION_KWARGS_VERBOSE)
+def debug_settings(verbosity: int):
+    """
+    Display (anonymized) MQTT server username and password
+    """
+    setup_logging(verbosity=verbosity)
+    try:
+        debug_print_user_settings(user_settings=UserSettings(), settings_path=USER_SETTINGS_PATH)
+    except UserSettingsNotFound as err:
+        print(f'[yellow]No settings created yet[/yellow]: {err} [green](Hint: call "edit-settings" first!)')
+
+
+cli.add_command(debug_settings)
+
+
+######################################################################################################
+
+
+@click.command()
+@click.option('--ip', **option_kwargs_ip)
+@click.option('--port', **option_kwargs_port)
+@click.option('--inverter', **option_kwargs_inverter_name)
+@click.option('-v', '--verbosity', **OPTION_KWARGS_VERBOSE)
+def print_values(ip, port, inverter, verbosity: int):
     """
     Print all known register values from Inverter, e.g.:
 
     .../inverter-connect$ ./cli.py print-values 192.168.123.456
     """
-    basic_log_setup(debug=debug)
+    if user_settings is None:
+        print('[yellow]No settings created yet! [green]Call "edit-settings" first!')
+        return
 
-    config = Config(inverter_name=inverter, host=ip, port=port, verbose=verbose, debug=debug)
+    setup_logging(verbosity=verbosity)
+
+    print()
+
+    config = make_config(
+        user_settings=user_settings,
+        verbosity=verbosity,
+        ip=ip,
+        port=port,
+        inverter=inverter,
+    )
 
     with Inverter(config=config) as inverter:
         try:
@@ -130,7 +204,7 @@ def print_values(ip, port, inverter, verbose, debug):
             elif value.type == ValueType.COMPUTED:
                 print('(Computed)')
 
-            if debug:
+            if verbosity:
                 print()
 
 
@@ -138,14 +212,11 @@ cli.add_command(print_values)
 
 
 @click.command()
-@click.argument('ip')
 @click.argument('commands', nargs=-1)
-@click.option(
-    '--port', type=click.IntRange(1000, 65535), default=48899, help='Port of the inverter', show_default=True
-)
-@click.option('--verbose/--no-verbose', **OPTION_ARGS_DEFAULT_TRUE)
-@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
-def print_at_commands(ip, port, commands, verbose, debug):
+@click.option('--ip', **option_kwargs_ip)
+@click.option('--port', **option_kwargs_port)
+@click.option('-v', '--verbosity', **OPTION_KWARGS_VERBOSE)
+def print_at_commands(ip, port, commands, verbosity: int):
     """
     Print one or more AT command values from Inverter.
 
@@ -168,7 +239,11 @@ def print_at_commands(ip, port, commands, verbose, debug):
 
     (Note: The prefix "AT+" will be added to every command)
     """
-    basic_log_setup(debug=debug)
+    if user_settings is None:
+        print('[yellow]No settings created yet! [green]Call "edit-settings" first!')
+        return
+
+    setup_logging(verbosity=verbosity)
 
     if not commands:
         commands = (
@@ -215,7 +290,13 @@ def print_at_commands(ip, port, commands, verbose, debug):
             'DEVSELCTL',  # Set/Get Web Device List Info
         )
 
-    config = Config(inverter_name=None, host=ip, port=port, verbose=verbose, debug=debug)
+    config = make_config(
+        user_settings=user_settings,
+        verbosity=verbosity,
+        ip=ip,
+        port=port,
+        inverter=None,
+    )
 
     with InverterSock(config) as inv_sock:
         try:
@@ -234,14 +315,11 @@ cli.add_command(print_at_commands)
 
 
 @click.command()
-@click.argument('ip')
-@click.option(
-    '--port', type=click.IntRange(1000, 65535), default=48899, help='Port of the inverter', show_default=True
-)
+@click.option('--ip', **option_kwargs_ip)
+@click.option('--port', **option_kwargs_port)
 @click.option('--register', default="0x16", help='Start address', show_default=True)
-@click.option('--verbose/--no-verbose', **OPTION_ARGS_DEFAULT_TRUE)
-@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_TRUE)
-def set_time(ip, port, register, verbose, debug):
+@click.option('-v', '--verbosity', **OPTION_KWARGS_VERBOSE)
+def set_time(ip, port, register, verbosity: int):
     """
     Set current date time in the inverter device.
 
@@ -250,9 +328,21 @@ def set_time(ip, port, register, verbose, debug):
         0x17 - day + hour
         0x18 - minute + second
     """
-    address = convert_address_option(raw_address=register, debug=debug)
+    if user_settings is None:
+        print('[yellow]No settings created yet! [green]Call "edit-settings" first!')
+        return
 
-    config = Config(inverter_name=None, host=ip, port=port, verbose=verbose, debug=debug)
+    setup_logging(verbosity=verbosity)
+
+    address = convert_address_option(raw_address=register, debug=bool(verbosity))
+
+    config = make_config(
+        user_settings=user_settings,
+        verbosity=verbosity,
+        ip=ip,
+        port=port,
+        inverter=None,
+    )
 
     with InverterSock(config) as inv_sock:
         try:
@@ -277,15 +367,12 @@ cli.add_command(set_time)
 
 
 @click.command()
-@click.argument('ip')
-@click.option(
-    '--port', type=click.IntRange(1000, 65535), default=48899, help='Port of the inverter', show_default=True
-)
+@click.option('--ip', **option_kwargs_ip)
+@click.option('--port', **option_kwargs_port)
 @click.argument('register')
 @click.argument('length', type=click.IntRange(1, 100))
-@click.option('--verbose/--no-verbose', **OPTION_ARGS_DEFAULT_TRUE)
-@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
-def read_register(ip, port, register, length, verbose, debug):
+@click.option('-v', '--verbosity', **OPTION_KWARGS_VERBOSE)
+def read_register(ip, port, register, length, verbosity: int):
     """
     Read register(s) from the inverter
 
@@ -299,10 +386,22 @@ def read_register(ip, port, register, length, verbose, debug):
 
     The start address can be pass as decimal number or as hex string, e.g.: 0x123
     """
-    print(f'Read {length} register(s) from {register=!r} ({ip}:{port})')
-    address = convert_address_option(raw_address=register, debug=debug)
+    if user_settings is None:
+        print('[yellow]No settings created yet! [green]Call "edit-settings" first!')
+        return
 
-    config = Config(inverter_name=None, host=ip, port=port, verbose=verbose, debug=debug)
+    setup_logging(verbosity=verbosity)
+
+    print(f'Read {length} register(s) from {register=!r} ({ip}:{port})')
+    address = convert_address_option(raw_address=register, debug=bool(verbosity))
+
+    config = make_config(
+        user_settings=user_settings,
+        verbosity=verbosity,
+        ip=ip,
+        port=port,
+        inverter=None,
+    )
 
     with InverterSock(config) as inv_sock:
         try:
@@ -322,69 +421,18 @@ cli.add_command(read_register)
 
 
 @click.command()
-@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
-def store_settings(debug):
-    """
-    Store MQTT server settings.
-    """
-    basic_log_setup(debug=debug)
-
-    try:
-        settings: MqttSettings = get_mqtt_settings()
-    except FileNotFoundError:
-        print('No settings stored, yet. ok.')
-        print()
-        print('Input settings:')
-    else:
-        print('Current settings:')
-        pprint(settings.anonymized())
-        print()
-        print('Input new settings:')
-
-    host = input('host (e.g.: "test.mosquitto.org"): ')
-    if not host:
-        print('Host is needed! Abort.')
-        sys.exit(1)
-
-    port = input('port (default: 1883): ')
-    if port:
-        port = int(port)
-    else:
-        port = 1883
-    user_name = input('user name: ')
-    password = getpass.getpass('password: ')
-
-    settings = MqttSettings(host=host, port=port, user_name=user_name, password=password)
-    file_path = store_mqtt_settings(settings)
-    print(f'MQTT server settings stored into: {file_path}')
-
-
-cli.add_command(store_settings)
-
-
-@click.command()
-@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
-def debug_settings(debug):
-    """
-    Display (anonymized) MQTT server username and password
-    """
-    basic_log_setup(debug=debug)
-    settings: MqttSettings = get_mqtt_settings()
-    pprint(settings.anonymized())
-
-
-cli.add_command(debug_settings)
-
-
-@click.command()
-@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
-def test_mqtt_connection(debug):
+@click.option('-v', '--verbosity', **OPTION_KWARGS_VERBOSE)
+def test_mqtt_connection(verbosity: int):
     """
     Test connection to MQTT Server
     """
-    basic_log_setup(debug=debug)
-    settings: MqttSettings = get_mqtt_settings()
-    mqttc = get_connected_client(settings=settings, verbose=True)
+    if user_settings is None:
+        print('[yellow]No settings created yet! [green]Call "edit-settings" first!')
+        return
+
+    setup_logging(verbosity=verbosity)
+
+    mqttc = get_connected_client(settings=user_settings.mqtt, verbose=True)
     mqttc.loop_start()
     mqttc.loop_stop()
     mqttc.disconnect()
@@ -395,35 +443,32 @@ cli.add_command(test_mqtt_connection)
 
 
 @click.command()
-@click.argument('ip')
-@click.option(
-    '--port',
-    type=click.IntRange(1000, 65535),
-    default=48899,
-    help='Port of the inverter',
-    show_default=True,
-    required=True,
-)
-@click.option('--inverter', **INVERTER_NAME)
-@click.option('--log/--no-log', **OPTION_ARGS_DEFAULT_TRUE)
-@click.option('--verbose/--no-verbose', **OPTION_ARGS_DEFAULT_TRUE)
-@click.option('--debug/--no-debug', **OPTION_ARGS_DEFAULT_FALSE)
-def publish_loop(ip, port, inverter, log, verbose, debug):
+@click.option('--ip', **option_kwargs_ip)
+@click.option('--port', **option_kwargs_port)
+@click.option('--inverter', **option_kwargs_inverter_name)
+@click.option('-v', '--verbosity', **OPTION_KWARGS_VERBOSE)
+def publish_loop(ip, port, inverter, verbosity: int):
     """
     Publish current data via MQTT for Home Assistant (endless loop)
 
     The "Daily Production" count will be cleared in the night,
     by set the current date time via AT-command.
     """
-    if log:
-        basic_log_setup(debug=debug)
+    if user_settings is None:
+        print('[yellow]No settings created yet! [green]Call "edit-settings" first!')
+        return
 
-    config = Config(inverter_name=inverter, host=ip, port=port, verbose=verbose, debug=debug)
+    setup_logging(verbosity=verbosity)
 
-    mqtt_settings: MqttSettings = get_mqtt_settings()
-    pprint(mqtt_settings.anonymized())
+    config = make_config(
+        user_settings=user_settings,
+        verbosity=verbosity,
+        ip=ip,
+        port=port,
+        inverter=inverter,
+    )
     try:
-        publish_forever(mqtt_settings=mqtt_settings, config=config, verbose=verbose)
+        publish_forever(config=config, verbosity=verbosity)
     except KeyboardInterrupt:
         print('Bye, bye')
 

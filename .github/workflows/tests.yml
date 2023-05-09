@@ -40,10 +40,13 @@ jobs:
       # The first CLI call will create the .venv
       run: |
         ./dev-cli.py version
+        ./dev-cli.py create-default-settings
+        ./cli.py version
 
     - name: 'CLI help'
       run: |
         ./dev-cli.py --help
+        ./cli.py --help
 
     - name: 'Safety'
       run: |

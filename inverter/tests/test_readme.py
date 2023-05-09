@@ -1,11 +1,20 @@
+import tempfile
+from pathlib import Path
+
+import tomlkit
 from bx_py_utils.auto_doc import assert_readme_block
+from bx_py_utils.environ import OverrideEnviron
 from bx_py_utils.path import assert_is_file
-from manageprojects.test_utils.click_cli_utils import invoke_click
+from click._compat import strip_ansi
+from ha_services.toml_settings.serialize import dataclass2toml
+from manageprojects.test_utils.click_cli_utils import subprocess_cli
 from manageprojects.tests.base import BaseTestCase
+from tomlkit import TOMLDocument
 
 from inverter import constants
-from inverter.cli.cli_app import PACKAGE_ROOT, cli
-from inverter.cli.dev import cli as dev_cli
+from inverter.cli.cli_app import PACKAGE_ROOT
+from inverter.constants import USER_SETTINGS_PATH
+from inverter.user_settings import UserSettings
 
 
 def assert_cli_help_in_readme(text_block: str, marker: str):
@@ -23,8 +32,44 @@ def assert_cli_help_in_readme(text_block: str, marker: str):
 
 
 class ReadmeTestCase(BaseTestCase):
+    def invoke(self, *, cli_bin, args):
+        """
+        IMPORTANT: We must ensure that no local user settings added to the help text
+        So we can't directly invoke_click() here, because user settings are read and
+        used on module level!
+        So we must use subprocess and use a default settings file!
+        """
+        with tempfile.TemporaryDirectory(prefix='test-inverter-connect') as temp_dir:
+            temp_path = Path(temp_dir)
+
+            with OverrideEnviron(HOME=temp_dir, TERM='dump', PYTHONUNBUFFERED='1'):
+                assert Path('~').expanduser() == temp_path
+
+                document: TOMLDocument = dataclass2toml(instance=UserSettings())
+                doc_str = tomlkit.dumps(document, sort_keys=False)
+                Path(USER_SETTINGS_PATH).expanduser().write_text(doc_str, encoding='UTF-8')
+
+                stdout = subprocess_cli(cli_bin=cli_bin, args=args)
+
+                stdout = strip_ansi(stdout)  # FIXME
+
+                # Skip header stuff:
+                lines = stdout.splitlines()
+                for pos, line in enumerate(lines):
+                    if line.lstrip().startswith('Usage: ./'):
+                        stdout = '\n'.join(lines[pos:])
+                        break
+
+                return '\n'.join(line.rstrip() for line in stdout.splitlines())
+
+    def invoke_cli(self, *args):
+        return self.invoke(cli_bin=PACKAGE_ROOT / 'cli.py', args=args)
+
+    def invoke_dev_cli(self, *args):
+        return self.invoke(cli_bin=PACKAGE_ROOT / 'dev-cli.py', args=args)
+
     def test_main_help(self):
-        stdout = invoke_click(cli, '--help')
+        stdout = self.invoke_cli('--help')
         self.assert_in_content(
             got=stdout,
             parts=(
@@ -37,7 +82,7 @@ class ReadmeTestCase(BaseTestCase):
         assert_cli_help_in_readme(text_block=stdout, marker='main help')
 
     def test_dev_help(self):
-        stdout = invoke_click(dev_cli, '--help')
+        stdout = self.invoke_dev_cli('--help')
         self.assert_in_content(
             got=stdout,
             parts=(
@@ -50,49 +95,53 @@ class ReadmeTestCase(BaseTestCase):
         assert_cli_help_in_readme(text_block=stdout, marker='dev help')
 
     def test_publish_loop_help(self):
-        stdout = invoke_click(cli, 'publish-loop', '--help')
+        stdout = self.invoke_cli('publish-loop', '--help')
         self.assert_in_content(
             got=stdout,
             parts=(
-                'Usage: ./cli.py publish-loop [OPTIONS] IP',
+                'Usage: ./cli.py publish-loop [OPTIONS]',
+                'IP address of your inverter [required]',
                 '--port',
-                '--debug/--no-debug',
+                '--verbosity',
             ),
         )
         assert_cli_help_in_readme(text_block=stdout, marker='publish-loop help')
 
     def test_print_values_help(self):
-        stdout = invoke_click(cli, 'print-values', '--help')
+        stdout = self.invoke_cli('print-values', '--help')
         self.assert_in_content(
             got=stdout,
             parts=(
-                'Usage: ./cli.py print-values [OPTIONS] IP',
+                'Usage: ./cli.py print-values [OPTIONS]',
+                'IP address of your inverter [required]',
                 '--port',
-                '--debug/--no-debug',
+                '--verbosity',
             ),
         )
         assert_cli_help_in_readme(text_block=stdout, marker='print-values help')
 
     def test_print_at_commands(self):
-        stdout = invoke_click(cli, 'print-at-commands', '--help')
+        stdout = self.invoke_cli('print-at-commands', '--help')
         self.assert_in_content(
             got=stdout,
             parts=(
-                'Usage: ./cli.py print-at-commands [OPTIONS] IP [COMMANDS]...',
+                'Usage: ./cli.py print-at-commands [OPTIONS] [COMMANDS]...',
+                'IP address of your inverter [required]',
                 '--port',
-                '--debug/--no-debug',
+                '--verbosity',
             ),
         )
         assert_cli_help_in_readme(text_block=stdout, marker='print-at-commands help')
 
     def test_read_register(self):
-        stdout = invoke_click(cli, 'read-register', '--help')
+        stdout = self.invoke_cli('read-register', '--help')
         self.assert_in_content(
             got=stdout,
             parts=(
-                'Usage: ./cli.py read-register [OPTIONS] IP REGISTER LENGTH',
+                'Usage: ./cli.py read-register [OPTIONS] REGISTER LENGTH',
+                'IP address of your inverter [required]',
                 '--port',
-                '--debug/--no-debug',
+                '--verbosity',
             ),
         )
         assert_cli_help_in_readme(text_block=stdout, marker='read-register help')
