@@ -8,3 +8,13 @@ validators:
       type: "int"
       min_value: 0
       max_value: 600
+
+    - name: "PV1 Power"
+      type: "int"
+      min_value: 0
+      max_value: 400
+
+    - name: "PV2 Power"
+      type: "int"
+      min_value: 0
+      max_value: 400

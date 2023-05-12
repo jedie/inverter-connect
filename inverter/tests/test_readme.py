@@ -3,7 +3,6 @@ from pathlib import Path
 
 from bx_py_utils.auto_doc import assert_readme_block
 from bx_py_utils.path import assert_is_file
-from click._compat import strip_ansi
 from manageprojects.test_utils.click_cli_utils import subprocess_cli
 from manageprojects.tests.base import BaseTestCase
 
@@ -39,7 +38,7 @@ class ReadmeTestCase(BaseTestCase):
             temp_path = Path(temp_dir)
 
             with MockedUserSetting(
-                temp_path=temp_path, settings_dataclass=UserSettings, TERM='dump'
+                temp_path=temp_path, settings_dataclass=UserSettings, COLUMNS='120', TERM='dump', NO_COLOR='1'
             ) as user_settings_mock:
                 assert Path('~').expanduser() == temp_path
 
@@ -49,7 +48,7 @@ class ReadmeTestCase(BaseTestCase):
 
                 stdout = subprocess_cli(cli_bin=cli_bin, args=args)
 
-                stdout = strip_ansi(stdout)  # FIXME
+                # stdout = strip_ansi(stdout)  # FIXME
 
                 # Skip header stuff:
                 lines = stdout.splitlines()
