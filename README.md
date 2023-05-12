@@ -174,9 +174,9 @@ Usage: ./cli.py read-register [OPTIONS] REGISTER LENGTH
 
  Read register(s) from the inverter
  e.g.: read 3 registers starting from 0x16:
- .../inverter-connect$ ./cli.py read-register 192.168.123.456 0x16 3
+ .../inverter-connect$ ./cli.py read-register 0x16 3
  e.g.: read the first 32 registers:
- .../inverter-connect$ ./cli.py read-register 192.168.123.456 0 32
+ .../inverter-connect$ ./cli.py read-register 0 32
  The start address can be pass as decimal number or as hex string, e.g.: 0x123
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮

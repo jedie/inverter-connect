@@ -2,12 +2,14 @@
     CLI for development
 """
 import logging
+import os
 import sys
 from pathlib import Path
 
 import rich_click as click
 import tomlkit
 from bx_py_utils.path import assert_is_file
+from ha_services.toml_settings.api import TomlSettings
 from ha_services.toml_settings.serialize import dataclass2toml
 from manageprojects.utilities import code_style
 from manageprojects.utilities.publish import publish_package
@@ -19,7 +21,7 @@ from tomlkit import TOMLDocument
 
 import inverter
 from inverter import constants
-from inverter.constants import USER_SETTINGS_PATH
+from inverter.constants import SETTINGS_DIR_NAME, SETTINGS_FILE_NAME
 from inverter.user_settings import UserSettings
 
 
@@ -309,16 +311,28 @@ cli.add_command(version)
 
 ######################################################################################################
 @click.command()
-def create_default_settings():
+@click.option('--force', **OPTION_ARGS_DEFAULT_FALSE)
+def create_default_settings(force):
     """
     Create a default user settings file. (Used by CI pipeline ;)
     """
-    settings_path = Path(USER_SETTINGS_PATH).expanduser()
+    if not force and 'CI' not in os.environ:
+        print('We are not running in CI pipeline and "--force" not used -> Abort.')
+        sys.exit(-1)
+
+    settings_dataclass = UserSettings()
+    toml_settings = TomlSettings(
+        dir_name=SETTINGS_DIR_NAME,
+        file_name=SETTINGS_FILE_NAME,
+        settings_dataclass=settings_dataclass,
+    )
+
+    settings_path = toml_settings.file_path
     if settings_path.is_file():
         print(f'[green]Use settings file already exists here: {settings_path}')
         return
 
-    document: TOMLDocument = dataclass2toml(instance=UserSettings())
+    document: TOMLDocument = dataclass2toml(instance=settings_dataclass)
     doc_str = tomlkit.dumps(document, sort_keys=False)
 
     settings_path.write_text(doc_str, encoding='UTF-8')
