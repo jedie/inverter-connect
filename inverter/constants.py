@@ -17,4 +17,5 @@ TYPE_MAP = {
     'int': int,
 }
 
-USER_SETTINGS_PATH = '~/.inverter-connect.toml'
+SETTINGS_DIR_NAME = 'inverter-connect'
+SETTINGS_FILE_NAME = 'inverter-connect'

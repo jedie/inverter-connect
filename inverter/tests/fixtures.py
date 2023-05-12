@@ -1,5 +1,18 @@
-from ha_services.mqtt4homeassistant.data_classes import MqttSettings
+import dataclasses
+import os
+from pathlib import Path
+from unittest import mock
 
+import tomlkit
+from bx_py_utils.environ import OverrideEnviron
+from bx_py_utils.test_utils.context_managers import MassContextManager
+from ha_services.mqtt4homeassistant.data_classes import MqttSettings
+from ha_services.systemd import defaults
+from ha_services.toml_settings.api import TomlSettings
+from ha_services.toml_settings.serialize import dataclass2toml
+from tomlkit import TOMLDocument
+
+from inverter.constants import SETTINGS_DIR_NAME, SETTINGS_FILE_NAME
 from inverter.data_types import Config
 
 
@@ -20,3 +33,66 @@ def get_config(**kwargs) -> Config:
         ),
     )
     return Config(**kwargs)
+
+
+class MockCurrentWorkDir:
+    def __init__(self, temp_path: Path):
+        self.temp_path = temp_path
+        self.old_cwd = Path().cwd()
+        assert self.temp_path != self.old_cwd
+
+    def __enter__(self):
+        os.chdir(self.temp_path)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        os.chdir(self.old_cwd)
+        if exc_type:
+            return False
+
+
+class MockedSys:
+    executable = '/mocked/.venv/bin/python3'
+
+
+class MockedUserSetting(MassContextManager):
+    """
+    TODO: Move to hs-services !
+    """
+
+    def __init__(self, temp_path: Path, settings_dataclass: dataclasses, **env_overwrites):
+        self.temp_path = temp_path
+
+        assert dataclasses.is_dataclass(settings_dataclass)
+        self.settings_dataclass = settings_dataclass
+
+        env_overwrites.setdefault('PYTHONUNBUFFERED', '1')
+        env_overwrites.setdefault('COLUMNS', '120')
+
+        self.mocks = (
+            MockCurrentWorkDir(temp_path=temp_path),
+            OverrideEnviron(HOME=str(temp_path), **env_overwrites),
+            mock.patch.object(defaults, 'sys', MockedSys()),
+        )
+
+    def __enter__(self) -> 'MockedUserSetting':
+        super().__enter__()
+
+        mocked_systemd_base_path = self.temp_path / 'etc-systemd-system'
+        mocked_systemd_base_path.mkdir()
+
+        Path(self.temp_path, '.config').mkdir()
+
+        settings_dataclass = self.settings_dataclass()
+        self.toml_settings = TomlSettings(
+            dir_name=SETTINGS_DIR_NAME,
+            file_name=SETTINGS_FILE_NAME,
+            settings_dataclass=settings_dataclass,
+        )
+        self.settings_file_path = self.toml_settings.file_path
+
+        document: TOMLDocument = dataclass2toml(instance=settings_dataclass)
+        doc_str = tomlkit.dumps(document, sort_keys=False)
+        self.settings_file_path.write_text(doc_str, encoding='UTF-8')
+
+        return self

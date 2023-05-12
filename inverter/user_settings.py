@@ -6,11 +6,11 @@ from pathlib import Path
 
 import tomlkit
 from ha_services.mqtt4homeassistant.data_classes import MqttSettings as OriginMqttSettings
+from ha_services.toml_settings.api import TomlSettings
 from ha_services.toml_settings.serialize import dataclass2toml
 from rich import print  # noqa
 from tomlkit import TOMLDocument
 
-from inverter.constants import USER_SETTINGS_PATH
 from inverter.data_types import Config
 from inverter.utilities.cli import exit_with_human_error
 
@@ -49,30 +49,43 @@ class UserSettings:
     inverter: dataclasses = dataclasses.field(default_factory=Inverter)
 
 
-def migrate_old_settings():  # TODO: Remove in the Future
-    new_settings_path = Path(USER_SETTINGS_PATH).expanduser()
-    if new_settings_path.is_file():
+def migrate_old_settings(toml_settings: TomlSettings):  # TODO: Remove in the Future
+    file_path = toml_settings.file_path  # '~/config/inverter-connect/inverter-connect.toml'
+    if file_path.is_file():
+        logging.debug('v2 settings file exists: %s -> no migration needed', file_path)
         return
+    else:
+        logging.debug('v2 settings not exists: %s -> try migration', file_path)
 
-    old_settings_path = Path('~/.inverter-connect').expanduser()
-    if not old_settings_path.is_file():
-        return
+    # '~/.inverter-connect' -> '~/config/inverter-connect/inverter-connect.toml'
+    v1_settings_path = Path('~/.inverter-connect').expanduser()
+    if v1_settings_path.is_file():
+        logging.info('Migrate v1 settings from: %s', v1_settings_path)
+        settings_str = v1_settings_path.read_text(encoding='UTF-8')
+        assert settings_str, f'Empty file: {v1_settings_path} (Please remove it!)'
+        data = json.loads(settings_str)
+        mqtt = MqttSettings(**data)
+        user_settings = UserSettings()
+        user_settings.mqtt = mqtt
 
-    logging.info('Migrate old settings from: %s', old_settings_path)
-    settings_str = old_settings_path.read_text(encoding='UTF-8')
-    data = json.loads(settings_str)
-    mqtt = MqttSettings(**data)
-    user_settings = UserSettings()
-    user_settings.mqtt = mqtt
+        document: TOMLDocument = dataclass2toml(instance=user_settings)
+        doc_str = tomlkit.dumps(document, sort_keys=False)
 
-    document: TOMLDocument = dataclass2toml(instance=user_settings)
-    doc_str = tomlkit.dumps(document, sort_keys=False)
+        file_path.write_text(doc_str, encoding='UTF-8')
 
-    new_settings_path.write_text(doc_str, encoding='UTF-8')
+        logging.info('Migrate settings to: %s', file_path)
 
-    logging.info('Migrate settings to: %s', new_settings_path)
+        v1_settings_path.unlink()
+    else:
+        logging.debug('No v1 settings file: %s', v1_settings_path)
 
-    old_settings_path.unlink()
+        v2_settings_path = Path('~/.inverter-connect.toml').expanduser()
+        if v2_settings_path.is_file():
+            logging.info('Move settings file %s to %s', v2_settings_path, file_path)
+            file_path.parent.mkdir(exist_ok=True)
+            v2_settings_path.rename(file_path)
+        else:
+            logging.debug('No old settings file found here: %s', v2_settings_path)
 
 
 def make_config(*, user_settings: UserSettings, ip, port, verbosity, inverter=None) -> Config:

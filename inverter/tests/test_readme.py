@@ -1,19 +1,15 @@
 import tempfile
 from pathlib import Path
 
-import tomlkit
 from bx_py_utils.auto_doc import assert_readme_block
-from bx_py_utils.environ import OverrideEnviron
 from bx_py_utils.path import assert_is_file
 from click._compat import strip_ansi
-from ha_services.toml_settings.serialize import dataclass2toml
 from manageprojects.test_utils.click_cli_utils import subprocess_cli
 from manageprojects.tests.base import BaseTestCase
-from tomlkit import TOMLDocument
 
 from inverter import constants
 from inverter.cli.cli_app import PACKAGE_ROOT
-from inverter.constants import USER_SETTINGS_PATH
+from inverter.tests.fixtures import MockedUserSetting
 from inverter.user_settings import UserSettings
 
 
@@ -42,12 +38,14 @@ class ReadmeTestCase(BaseTestCase):
         with tempfile.TemporaryDirectory(prefix='test-inverter-connect') as temp_dir:
             temp_path = Path(temp_dir)
 
-            with OverrideEnviron(HOME=temp_dir, TERM='dump', PYTHONUNBUFFERED='1'):
+            with MockedUserSetting(
+                temp_path=temp_path, settings_dataclass=UserSettings, TERM='dump'
+            ) as user_settings_mock:
                 assert Path('~').expanduser() == temp_path
 
-                document: TOMLDocument = dataclass2toml(instance=UserSettings())
-                doc_str = tomlkit.dumps(document, sort_keys=False)
-                Path(USER_SETTINGS_PATH).expanduser().write_text(doc_str, encoding='UTF-8')
+                toml_file_path = temp_path / '.config' / 'inverter-connect' / 'inverter-connect.toml'
+                assert user_settings_mock.settings_file_path == toml_file_path
+                assert_is_file(toml_file_path)
 
                 stdout = subprocess_cli(cli_bin=cli_bin, args=args)
 

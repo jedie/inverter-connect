@@ -7,19 +7,22 @@ import sys
 import time
 from pathlib import Path
 
+import rich_click
 import rich_click as click
 from bx_py_utils.path import assert_is_file
 from ha_services.mqtt4homeassistant.mqtt import get_connected_client
-from ha_services.toml_settings.api import debug_print_user_settings, edit_user_settings, get_user_settings
+from ha_services.toml_settings.api import TomlSettings
 from ha_services.toml_settings.exceptions import UserSettingsNotFound
 from rich import print  # noqa
+from rich.console import Console
+from rich.traceback import install as rich_traceback_install
 from rich_click import RichGroup
 
 import inverter
 from inverter import constants
 from inverter.api import Inverter, set_current_time
 from inverter.connection import InverterSock
-from inverter.constants import ERROR_STR_NO_DATA, USER_SETTINGS_PATH
+from inverter.constants import ERROR_STR_NO_DATA, SETTINGS_DIR_NAME, SETTINGS_FILE_NAME
 from inverter.data_types import Parameter, ValueType
 from inverter.exceptions import ReadInverterError
 from inverter.publish_loop import publish_forever
@@ -84,15 +87,16 @@ cli.add_command(version)
 ######################################################################################################
 # User settings
 
-
-migrate_old_settings()  # TODO: Remove in the Future
+toml_settings = TomlSettings(
+    dir_name=SETTINGS_DIR_NAME,
+    file_name=SETTINGS_FILE_NAME,
+    settings_dataclass=UserSettings(),
+)
+migrate_old_settings(toml_settings)  # TODO: Remove in the Future
 
 try:
-    user_settings: UserSettings = get_user_settings(user_settings=UserSettings(), settings_path=USER_SETTINGS_PATH)
+    user_settings: UserSettings = toml_settings.get_user_settings(debug=True)
 except UserSettingsNotFound:
-    print(f'[red]No settings file found: [yellow]{USER_SETTINGS_PATH}')
-    input('Press any key, to create it')
-    edit_user_settings(user_settings=UserSettings(), settings_path=USER_SETTINGS_PATH)
     sys.exit(1)
 
 
@@ -126,7 +130,7 @@ def edit_settings(verbosity: int):
     Edit the settings file. On first call: Create the default one.
     """
     setup_logging(verbosity=verbosity)
-    edit_user_settings(user_settings=UserSettings(), settings_path=USER_SETTINGS_PATH)
+    toml_settings.open_in_editor()
 
 
 cli.add_command(edit_settings)
@@ -139,10 +143,7 @@ def debug_settings(verbosity: int):
     Display (anonymized) MQTT server username and password
     """
     setup_logging(verbosity=verbosity)
-    try:
-        debug_print_user_settings(user_settings=UserSettings(), settings_path=USER_SETTINGS_PATH)
-    except UserSettingsNotFound as err:
-        print(f'[yellow]No settings created yet[/yellow]: {err} [green](Hint: call "edit-settings" first!)')
+    toml_settings.print_settings()
 
 
 cli.add_command(debug_settings)
@@ -162,10 +163,6 @@ def print_values(ip, port, inverter, verbosity: int):
 
     .../inverter-connect$ ./cli.py print-values 192.168.123.456
     """
-    if user_settings is None:
-        print('[yellow]No settings created yet! [green]Call "edit-settings" first!')
-        return
-
     setup_logging(verbosity=verbosity)
 
     print()
@@ -239,10 +236,6 @@ def print_at_commands(ip, port, commands, verbosity: int):
 
     (Note: The prefix "AT+" will be added to every command)
     """
-    if user_settings is None:
-        print('[yellow]No settings created yet! [green]Call "edit-settings" first!')
-        return
-
     setup_logging(verbosity=verbosity)
 
     if not commands:
@@ -328,10 +321,6 @@ def set_time(ip, port, register, verbosity: int):
         0x17 - day + hour
         0x18 - minute + second
     """
-    if user_settings is None:
-        print('[yellow]No settings created yet! [green]Call "edit-settings" first!')
-        return
-
     setup_logging(verbosity=verbosity)
 
     address = convert_address_option(raw_address=register, debug=bool(verbosity))
@@ -378,17 +367,14 @@ def read_register(ip, port, register, length, verbosity: int):
 
     e.g.: read 3 registers starting from 0x16:
 
-        .../inverter-connect$ ./cli.py read-register 192.168.123.456 0x16 3
+        .../inverter-connect$ ./cli.py read-register 0x16 3
 
     e.g.: read the first 32 registers:
 
-    .../inverter-connect$ ./cli.py read-register 192.168.123.456 0 32
+    .../inverter-connect$ ./cli.py read-register 0 32
 
     The start address can be pass as decimal number or as hex string, e.g.: 0x123
     """
-    if user_settings is None:
-        print('[yellow]No settings created yet! [green]Call "edit-settings" first!')
-        return
 
     setup_logging(verbosity=verbosity)
 
@@ -426,9 +412,6 @@ def test_mqtt_connection(verbosity: int):
     """
     Test connection to MQTT Server
     """
-    if user_settings is None:
-        print('[yellow]No settings created yet! [green]Call "edit-settings" first!')
-        return
 
     setup_logging(verbosity=verbosity)
 
@@ -454,9 +437,6 @@ def publish_loop(ip, port, inverter, verbosity: int):
     The "Daily Production" count will be cleared in the night,
     by set the current date time via AT-command.
     """
-    if user_settings is None:
-        print('[yellow]No settings created yet! [green]Call "edit-settings" first!')
-        return
 
     setup_logging(verbosity=verbosity)
 
@@ -478,6 +458,14 @@ cli.add_command(publish_loop)
 
 def main():
     print(f'[bold][green]{inverter.__name__}[/green] v[cyan]{inverter.__version__}')
+
+    console = Console()
+    rich_traceback_install(
+        width=console.size.width,  # full terminal width
+        show_locals=True,
+        suppress=[click, rich_click],
+        max_frames=2,
+    )
 
     # Execute Click CLI:
     cli.name = './cli.py'
