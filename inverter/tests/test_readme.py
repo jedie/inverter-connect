@@ -1,74 +1,71 @@
-import tempfile
-from pathlib import Path
-
-from bx_py_utils.auto_doc import assert_readme_block
-from bx_py_utils.path import assert_is_file
-from manageprojects.test_utils.click_cli_utils import subprocess_cli
+from ha_services.cli_tools.test_utils.assertion import assert_in
+from ha_services.cli_tools.test_utils.cli_readme import AssertCliHelpInReadme
+from ha_services.cli_tools.test_utils.rich_test_utils import (
+    assert_no_color_env,
+    assert_rich_click_no_color,
+    assert_rich_no_color,
+    assert_subprocess_rich_diagnose_no_color,
+)
+from ha_services.toml_settings.test_utils.cli_mock import TomlSettingsCliMock
 from manageprojects.tests.base import BaseTestCase
 
 from inverter import constants
 from inverter.cli.cli_app import PACKAGE_ROOT
-from inverter.tests.fixtures import MockedUserSetting
+from inverter.constants import SETTINGS_DIR_NAME, SETTINGS_FILE_NAME
 from inverter.user_settings import UserSettings
 
 
-def assert_cli_help_in_readme(text_block: str, marker: str):
-    README_PATH = PACKAGE_ROOT / 'README.md'
-    assert_is_file(README_PATH)
-
-    text_block = text_block.replace(constants.CLI_EPILOG, '')
-    text_block = f'```\n{text_block.strip()}\n```'
-    assert_readme_block(
-        readme_path=README_PATH,
-        text_block=text_block,
-        start_marker_line=f'[comment]: <> (✂✂✂ auto generated {marker} start ✂✂✂)',
-        end_marker_line=f'[comment]: <> (✂✂✂ auto generated {marker} end ✂✂✂)',
-    )
+TERM_WIDTH = 100
 
 
 class ReadmeTestCase(BaseTestCase):
-    def invoke(self, *, cli_bin, args):
-        """
-        IMPORTANT: We must ensure that no local user settings added to the help text
-        So we can't directly invoke_click() here, because user settings are read and
-        used on module level!
-        So we must use subprocess and use a default settings file!
-        """
-        with tempfile.TemporaryDirectory(prefix='test-inverter-connect') as temp_dir:
-            temp_path = Path(temp_dir)
+    cli_mock = None
 
-            with MockedUserSetting(
-                temp_path=temp_path, settings_dataclass=UserSettings, COLUMNS='120', TERM='dump', NO_COLOR='1'
-            ) as user_settings_mock:
-                assert Path('~').expanduser() == temp_path
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
 
-                toml_file_path = temp_path / '.config' / 'inverter-connect' / 'inverter-connect.toml'
-                assert user_settings_mock.settings_file_path == toml_file_path
-                assert_is_file(toml_file_path)
+        settings_overwrites = dict(
+            systemd=dict(
+                template_context=dict(
+                    user='MockedUserName',
+                    group='MockedUserName',
+                )
+            ),
+        )
 
-                stdout = subprocess_cli(cli_bin=cli_bin, args=args)
+        cls.cli_mock = TomlSettingsCliMock(
+            SettingsDataclass=UserSettings,
+            settings_overwrites=settings_overwrites,
+            dir_name=SETTINGS_DIR_NAME,
+            file_name=SETTINGS_FILE_NAME,
+            width=TERM_WIDTH,
+        )
+        cls.cli_mock.__enter__()
 
-                # stdout = strip_ansi(stdout)  # FIXME
+        cls.readme_assert = AssertCliHelpInReadme(base_path=PACKAGE_ROOT, cli_epilog=constants.CLI_EPILOG)
 
-                # Skip header stuff:
-                lines = stdout.splitlines()
-                for pos, line in enumerate(lines):
-                    if line.lstrip().startswith('Usage: ./'):
-                        stdout = '\n'.join(lines[pos:])
-                        break
+    @classmethod
+    def tearDownClass(cls) -> None:
+        super().tearDownClass()
+        cls.cli_mock.__exit__(None, None, None)
 
-                return '\n'.join(line.rstrip() for line in stdout.splitlines())
+    def test_cli_mock(self):
+        assert_no_color_env(width=TERM_WIDTH)
+        assert_subprocess_rich_diagnose_no_color(width=TERM_WIDTH)
+        assert_rich_no_color(width=TERM_WIDTH)
+        assert_rich_click_no_color(width=TERM_WIDTH)
 
     def invoke_cli(self, *args):
-        return self.invoke(cli_bin=PACKAGE_ROOT / 'cli.py', args=args)
+        return self.cli_mock.invoke(cli_bin=PACKAGE_ROOT / 'cli.py', args=args, strip_line_prefix='Usage: ')
 
     def invoke_dev_cli(self, *args):
-        return self.invoke(cli_bin=PACKAGE_ROOT / 'dev-cli.py', args=args)
+        return self.cli_mock.invoke(cli_bin=PACKAGE_ROOT / 'dev-cli.py', args=args, strip_line_prefix='Usage: ')
 
     def test_main_help(self):
         stdout = self.invoke_cli('--help')
-        self.assert_in_content(
-            got=stdout,
+        assert_in(
+            content=stdout,
             parts=(
                 'Usage: ./cli.py [OPTIONS] COMMAND [ARGS]...',
                 'print-at-commands',
@@ -76,12 +73,12 @@ class ReadmeTestCase(BaseTestCase):
                 constants.CLI_EPILOG,
             ),
         )
-        assert_cli_help_in_readme(text_block=stdout, marker='main help')
+        self.readme_assert.assert_block(text_block=stdout, marker='main help')
 
     def test_dev_help(self):
         stdout = self.invoke_dev_cli('--help')
-        self.assert_in_content(
-            got=stdout,
+        assert_in(
+            content=stdout,
             parts=(
                 'Usage: ./dev-cli.py [OPTIONS] COMMAND [ARGS]...',
                 'fix-code-style',
@@ -89,12 +86,12 @@ class ReadmeTestCase(BaseTestCase):
                 constants.CLI_EPILOG,
             ),
         )
-        assert_cli_help_in_readme(text_block=stdout, marker='dev help')
+        self.readme_assert.assert_block(text_block=stdout, marker='dev help')
 
     def test_publish_loop_help(self):
         stdout = self.invoke_cli('publish-loop', '--help')
-        self.assert_in_content(
-            got=stdout,
+        assert_in(
+            content=stdout,
             parts=(
                 'Usage: ./cli.py publish-loop [OPTIONS]',
                 'IP address of your inverter [required]',
@@ -102,12 +99,12 @@ class ReadmeTestCase(BaseTestCase):
                 '--verbosity',
             ),
         )
-        assert_cli_help_in_readme(text_block=stdout, marker='publish-loop help')
+        self.readme_assert.assert_block(text_block=stdout, marker='publish-loop help')
 
     def test_print_values_help(self):
         stdout = self.invoke_cli('print-values', '--help')
-        self.assert_in_content(
-            got=stdout,
+        assert_in(
+            content=stdout,
             parts=(
                 'Usage: ./cli.py print-values [OPTIONS]',
                 'IP address of your inverter [required]',
@@ -115,12 +112,12 @@ class ReadmeTestCase(BaseTestCase):
                 '--verbosity',
             ),
         )
-        assert_cli_help_in_readme(text_block=stdout, marker='print-values help')
+        self.readme_assert.assert_block(text_block=stdout, marker='print-values help')
 
     def test_print_at_commands(self):
         stdout = self.invoke_cli('print-at-commands', '--help')
-        self.assert_in_content(
-            got=stdout,
+        assert_in(
+            content=stdout,
             parts=(
                 'Usage: ./cli.py print-at-commands [OPTIONS] [COMMANDS]...',
                 'IP address of your inverter [required]',
@@ -128,12 +125,12 @@ class ReadmeTestCase(BaseTestCase):
                 '--verbosity',
             ),
         )
-        assert_cli_help_in_readme(text_block=stdout, marker='print-at-commands help')
+        self.readme_assert.assert_block(text_block=stdout, marker='print-at-commands help')
 
     def test_read_register(self):
         stdout = self.invoke_cli('read-register', '--help')
-        self.assert_in_content(
-            got=stdout,
+        assert_in(
+            content=stdout,
             parts=(
                 'Usage: ./cli.py read-register [OPTIONS] REGISTER LENGTH',
                 'IP address of your inverter [required]',
@@ -141,4 +138,4 @@ class ReadmeTestCase(BaseTestCase):
                 '--verbosity',
             ),
         )
-        assert_cli_help_in_readme(text_block=stdout, marker='read-register help')
+        self.readme_assert.assert_block(text_block=stdout, marker='read-register help')

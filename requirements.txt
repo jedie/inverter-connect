@@ -12,9 +12,9 @@ binaryornot==0.4.4 \
     --hash=sha256:359501dfc9d40632edc9fac890e19542db1a287bbcfa58175b66658392018061 \
     --hash=sha256:b8b71173c917bddcd2c16070412e369c3ed7f0528926f70cac18a6c97fd563e4
     # via cookiecutter
-bx-py-utils==80 \
-    --hash=sha256:34c4f5e4e1199014a83139aa4285a85f84274a982f9a9a8eae056fd9848a42f7 \
-    --hash=sha256:59f3d641c516fdf75d47ea86cd84fe6405d07fc7761074dcbbb967b6962dcc09
+bx-py-utils==81 \
+    --hash=sha256:5c2e189cccbeb852b058078bc7b0a8976f5f691ee7de657a87eef43fc89fa59a \
+    --hash=sha256:fd282f9e4ed8ed2842154ffe3fdd2ca56c428023021afc5b8ff765a53c02cddb
     # via
     #   ha-services
     #   inverter-connect (pyproject.toml)
@@ -117,9 +117,9 @@ cookiecutter==2.1.1 \
     --hash=sha256:9f3ab027cec4f70916e28f03470bdb41e637a3ad354b4d65c765d93aad160022 \
     --hash=sha256:f3982be8d9c53dac1261864013fdec7f83afd2e42ede6f6dd069c5e149c540d5
     # via manageprojects
-ha-services==0.2.0rc0 \
-    --hash=sha256:1e118fd6c6054250a3856c60ae82eb8ad6c3f025f44fa825815aa10d8739cdf4 \
-    --hash=sha256:4c61dcf62918ec5ee1656756aa4cb15aa1c9fe6c57894fcf015e6d8659968d44
+ha-services==0.2.0 \
+    --hash=sha256:744b3624d7fd79808d67e641477356bfc56291d598df789a4e64515c50b2826e \
+    --hash=sha256:a48c0e80edcd5e81d72cc46e34b1bd1feaf88aef7894b89736d08f4f432f0dc6
     # via inverter-connect (pyproject.toml)
 idna==3.4 \
     --hash=sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4 \

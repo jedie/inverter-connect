@@ -2,17 +2,19 @@ import dataclasses
 import json
 import logging
 import socket
+import sys
 from pathlib import Path
 
 import tomlkit
+from ha_services.cli_tools.rich_utils import human_error
 from ha_services.mqtt4homeassistant.data_classes import MqttSettings as OriginMqttSettings
+from ha_services.systemd.data_classes import BaseSystemdServiceInfo, BaseSystemdServiceTemplateContext
 from ha_services.toml_settings.api import TomlSettings
 from ha_services.toml_settings.serialize import dataclass2toml
 from rich import print  # noqa
 from tomlkit import TOMLDocument
 
 from inverter.data_types import Config
-from inverter.utilities.cli import exit_with_human_error
 
 
 @dataclasses.dataclass
@@ -40,11 +42,31 @@ class Inverter:
 
 
 @dataclasses.dataclass
+class SystemdServiceTemplateContext(BaseSystemdServiceTemplateContext):
+    """
+    Context values for the systemd service file content
+    """
+
+    verbose_service_name: str = 'Inverter Connect'
+    exec_start: str = f'{sys.executable} -m inverter publish-loop'
+
+
+@dataclasses.dataclass
+class SystemdServiceInfo(BaseSystemdServiceInfo):
+    """
+    Information for systemd helper functions
+    """
+
+    template_context: SystemdServiceTemplateContext = dataclasses.field(default_factory=SystemdServiceTemplateContext)
+
+
+@dataclasses.dataclass
 class UserSettings:
     """
     User settings for inverter-connect
     """
 
+    systemd: dataclasses = dataclasses.field(default_factory=SystemdServiceInfo)
     mqtt: dataclasses = dataclasses.field(default_factory=MqttSettings)
     inverter: dataclasses = dataclasses.field(default_factory=Inverter)
 
@@ -93,7 +115,7 @@ def make_config(*, user_settings: UserSettings, ip, port, verbosity, inverter=No
     try:
         result = socket.gethostbyname(ip)
     except socket.gaierror as err:
-        exit_with_human_error(hint=f'Is the given {ip=!r} is wrong?!?', print_traceback=err)
+        human_error(message=f'Is the given {ip=!r} is wrong?!?', title='[red]IP address error', exception=err)
     else:
         logging.debug('%r -> %r', ip, result)
 
