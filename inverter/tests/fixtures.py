@@ -10,6 +10,7 @@ from ha_services.mqtt4homeassistant.data_classes import MqttSettings
 from ha_services.systemd import defaults
 from ha_services.toml_settings.api import TomlSettings
 from ha_services.toml_settings.serialize import dataclass2toml
+from rich import get_console
 from tomlkit import TOMLDocument
 
 from inverter.constants import SETTINGS_DIR_NAME, SETTINGS_FILE_NAME
@@ -96,3 +97,19 @@ class MockedUserSetting(MassContextManager):
         self.settings_file_path.write_text(doc_str, encoding='UTF-8')
 
         return self
+
+
+class NoColors(MassContextManager):
+    # TODO: Move to CLI-tools
+    mocks = (OverrideEnviron(COLUMNS='120', TERM='dump', NO_COLOR='1'),)
+
+    def __enter__(self):
+        super().__enter__()
+
+        console = get_console()  # global console instance
+        console._highlight = False
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        super().__exit__(exc_type, exc_val, exc_tb)
+        if exc_type:
+            return False
