@@ -21,14 +21,14 @@ from rich_click import RichGroup
 
 import inverter
 from inverter import constants
-from inverter.api import Inverter, set_current_time
+from inverter.api import Inverter, fetch_inverter_versions, set_current_time
 from inverter.connection import InverterSock
 from inverter.constants import ERROR_STR_NO_DATA, SETTINGS_DIR_NAME, SETTINGS_FILE_NAME
-from inverter.data_types import Parameter, ValueType
+from inverter.data_types import InverterRegisterVersionInfo, Parameter, ValueType
 from inverter.exceptions import ReadInverterError
 from inverter.publish_loop import publish_forever
 from inverter.user_settings import SystemdServiceInfo, UserSettings, make_config, migrate_old_settings
-from inverter.utilities.cli import convert_address_option, print_register
+from inverter.utilities.cli import convert_address_option, print_inverter_versions, print_register
 from inverter.verbosity import OPTION_KWARGS_VERBOSE, setup_logging
 
 
@@ -481,6 +481,44 @@ def read_register(ip, port, register, length, verbosity: int):
 
 
 cli.add_command(read_register)
+
+
+@click.command()
+@click.option('--ip', **option_kwargs_ip)
+@click.option('--port', **option_kwargs_port)
+@click.option('-v', '--verbosity', **OPTION_KWARGS_VERBOSE)
+def inverter_version(ip, port, verbosity: int):
+    """
+    Print all version information of the inverter
+    """
+    setup_logging(verbosity=verbosity)
+
+    config = make_config(
+        user_settings=user_settings,
+        verbosity=verbosity,
+        ip=ip,
+        port=port,
+        inverter=None,
+    )
+
+    with InverterSock(config) as inv_sock:
+        try:
+            inv_sock.connect()
+        except ReadInverterError as err:
+            print(f'[red]{err}')
+            sys.exit(1)
+
+        infos = [
+            InverterRegisterVersionInfo(name='Control Board Firmware', register=0x000D),
+            InverterRegisterVersionInfo(name='Communication Board Firmware', register=0x000E),
+            InverterRegisterVersionInfo(name='Communication Protocol', register=0x0012),
+        ]
+
+        results = fetch_inverter_versions(inv_sock=inv_sock, infos=infos)
+        print_inverter_versions(results)
+
+
+cli.add_command(inverter_version)
 
 
 ######################################################################################################

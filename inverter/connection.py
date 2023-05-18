@@ -283,6 +283,7 @@ class InverterSock:
             response: ModbusResponse = parse_modbus_response(data=data)
         except ParseModbusValueError as err:
             raise ParseModbusValueError(f'parse error: {data=}: {err}')
+
         return response
 
     def read_paremeter(self, *, parameter: Parameter) -> ModbusReadResult:
