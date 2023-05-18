@@ -4,11 +4,20 @@ import logging
 from collections.abc import Iterable
 from datetime import datetime
 
+from packaging.version import Version
 from rich import print  # noqa
 from rich.pretty import pprint
 
 from inverter.connection import InverterSock
-from inverter.data_types import Config, InverterValue, ModbusReadResult, ValueType
+from inverter.data_types import (
+    Config,
+    InverterRegisterVersionInfo,
+    InverterRegisterVersionResult,
+    InverterValue,
+    ModbusReadResult,
+    ModbusResponse,
+    ValueType,
+)
 from inverter.definitions import get_parameter
 from inverter.exceptions import ValidationError
 from inverter.validators import InverterValueValidator
@@ -152,3 +161,16 @@ def set_current_time(inv_sock: InverterSock, address=0x16, verbose=True):
 
     if verbose:
         print(f'Response: {data!r}')
+
+
+def fetch_inverter_versions(
+    *, inv_sock: InverterSock, infos: list[InverterRegisterVersionInfo]
+) -> list[InverterRegisterVersionResult]:
+    results = []
+    for info in infos:
+        print(f'Fetch "{info.name}"', end='...')
+        response: ModbusResponse = inv_sock.read(start_register=info.register, length=1)
+        print(f'Result (in hex): [cyan]{response.data_hex}')
+        version = Version('.'.join(number for number in response.data_hex))
+        results.append(InverterRegisterVersionResult(info=info, data_hex=response.data_hex, version=version))
+    return results

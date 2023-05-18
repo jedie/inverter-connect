@@ -2,11 +2,10 @@ from __future__ import annotations
 
 
 from bx_py_utils.iteration import chunk_iterable
-from rich import print  # noqa
-from rich.console import Console
+from rich import get_console, print  # noqa
 from rich.table import Table
 
-from inverter.data_types import ModbusResponse
+from inverter.data_types import InverterRegisterVersionResult, ModbusResponse
 from inverter.exceptions import ModbusNoData, ModbusNoHexData
 
 
@@ -48,7 +47,7 @@ def print_hex_table(address, data_hex, title):
             f'{int(hex_value, 16):>2}',  # Decimal
         )
 
-    console = Console()
+    console = get_console()
     console.print(table)
 
 
@@ -68,3 +67,28 @@ def print_register(inv_sock, start_register, length):
             data_hex=response.data_hex,
             title=f'[green][bold]{length} value(s) from {hex(start_register)}',
         )
+
+
+def print_inverter_versions(results: list[InverterRegisterVersionResult], title='Inventer Version Information'):
+    table = Table(title=title)
+    table.add_column('Counter\n', justify='right')
+    table.add_column('Name\n', justify='right')
+    table.add_column('Address\n(hex)', justify='center', style='cyan')
+    table.add_column('Address\n(dec)', justify='right', style='cyan')
+    table.add_column('Value\n(hex)', justify='center', style='')
+    table.add_column('[green]Version', justify='right', style='green')
+
+    for offset, result in enumerate(results):
+        table.add_row(
+            str(offset + 1),  # Counter
+            result.info.name,  # Name
+            hex(result.info.register + offset),  # Address (hex)
+            str(result.info.register + offset),  # Address (dec)
+            result.data_hex,  # Hex value
+            f'v{result.version}',  # Human readable version
+        )
+
+    console = get_console()
+    console.print('\n')
+    console.rule()
+    console.print(table)

@@ -9,6 +9,7 @@ from typing import Callable
 
 import msgspec
 from ha_services.mqtt4homeassistant.data_classes import MqttSettings
+from packaging.version import Version
 from rich import print
 
 from inverter.constants import BASE_PATH, TYPE_MAP
@@ -147,3 +148,16 @@ class ValueSpecs:
 
 class Validators(msgspec.Struct):
     validators: list[ValueSpecs]
+
+
+@dataclasses.dataclass
+class InverterRegisterVersionInfo:
+    name: str
+    register: int
+
+
+@dataclasses.dataclass
+class InverterRegisterVersionResult:
+    info: InverterRegisterVersionInfo
+    data_hex: str
+    version: Version

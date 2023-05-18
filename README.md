@@ -44,6 +44,7 @@ Usage: ./cli.py [OPTIONS] COMMAND [ARGS]...
 ╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────╮
 │ debug-settings        Display (anonymized) MQTT server username and password                     │
 │ edit-settings         Edit the settings file. On first call: Create the default one.             │
+│ inverter-version      Print all version information of the inverter                              │
 │ print-at-commands     Print one or more AT command values from Inverter.                         │
 │ print-values          Print all known register values from Inverter, e.g.:                       │
 │ publish-loop          Publish current data via MQTT for Home Assistant (endless loop)            │
