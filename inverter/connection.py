@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import socket
-import time
 
 import backoff
 from rich import print  # noqa
@@ -23,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 BACKOFF_DEFAULTS = dict(
-    max_tries=3,
+    max_tries=5,
     max_time=10,
     logger=__name__,
     backoff_log_level=logging.WARNING,
@@ -205,7 +204,7 @@ class InverterSock:
         logger.info(f'Connect to {self.config.host}:{self.config.port}...')
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.settimeout(self.config.timeout)
+        self.sock.settimeout(self.config.socket_timeout)
 
         self.init_inventer()
 
@@ -220,8 +219,6 @@ class InverterSock:
 
         if self.config.verbosity > 1:
             print('OK', flush=True)
-
-        time.sleep(self.config.pause)
 
     def recv_command(self, *, command: bytes, buffer_size=1024):
         self.send(command=command)

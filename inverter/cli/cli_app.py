@@ -14,8 +14,9 @@ from ha_services.mqtt4homeassistant.mqtt import get_connected_client
 from ha_services.systemd.api import ServiceControl
 from ha_services.toml_settings.api import TomlSettings
 from ha_services.toml_settings.exceptions import UserSettingsNotFound
-from rich import print  # noqa
+from rich import get_console, print  # noqa
 from rich.console import Console
+from rich.table import Table
 from rich.traceback import install as rich_traceback_install
 from rich_click import RichGroup
 
@@ -379,10 +380,30 @@ def print_at_commands(ip, port, commands, verbosity: int):
             print(f'[red]{err}')
             sys.exit(1)
 
+        print('Fetch', end='...')
+        results = []
         for command in commands:
-            print(f'\t* [grey]AT+[/grey][bold][yellow]{command:<10}[/yellow]:', end=' ')
+            print(f'[yellow]{command}', end=',')
             result: str = inv_sock.cleaned_at_command(command)
-            print(f'[green]{result}')
+            results.append(dict(command=command, result=result))
+
+    console = get_console()
+    console.print('\n')
+    console.rule()
+
+    table = Table(title='AT-command results')
+    table.add_column('Counter\n', justify='right')
+    table.add_column('Command\n', justify='right')
+    table.add_column('[green]Result', justify='left', style='green')
+
+    for offset, result in enumerate(results):
+        table.add_row(
+            str(offset + 1),  # Counter
+            f'[grey]AT+[/grey][bold][yellow]{result["command"]}',
+            result['result'],
+        )
+
+    console.print(table)
 
 
 cli.add_command(print_at_commands)
@@ -513,9 +534,9 @@ def inverter_version(ip, port, verbosity: int):
             InverterRegisterVersionInfo(name='Communication Board Firmware', register=0x000E),
             InverterRegisterVersionInfo(name='Communication Protocol', register=0x0012),
         ]
-
         results = fetch_inverter_versions(inv_sock=inv_sock, infos=infos)
-        print_inverter_versions(results)
+
+    print_inverter_versions(results)
 
 
 cli.add_command(inverter_version)

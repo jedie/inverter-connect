@@ -70,8 +70,7 @@ class Config:
 
     inverter_name: str | None
 
-    pause: float = 0.1
-    timeout: int = 5
+    socket_timeout: int = 5
 
     init_cmd: bytes = b'WIFIKIT-214028-READ'
 
