@@ -4,6 +4,7 @@ import logging
 import socket
 import time
 
+import backoff
 from rich import print  # noqa
 
 from inverter.constants import AT_READ_FUNC_NUMBER, AT_WRITE_FUNC_NUMBER, ERROR_STR_NO_DATA
@@ -19,6 +20,14 @@ from inverter.exceptions import (
 
 
 logger = logging.getLogger(__name__)
+
+
+BACKOFF_DEFAULTS = dict(
+    max_tries=3,
+    max_time=10,
+    logger=__name__,
+    backoff_log_level=logging.WARNING,
+)
 
 
 def make_modbus_result(*, response: ModbusResponse, parameter: Parameter) -> ModbusReadResult:
@@ -230,20 +239,13 @@ class InverterSock:
 
             return data
 
+    @backoff.on_exception(backoff.expo, ReadTimeout, **BACKOFF_DEFAULTS)
     def at_command(self, command: str, buffer_size=1024):
         assert not command.startswith('AT+'), f'Remove "AT+" prefix from: {command=}'
         assert not command.endswith('\n'), f'Line ending found in: {command=}'
         command = f'AT+{command}\n'.encode()
 
-        for try_count in range(3):
-            try:
-                return self.recv_command(command=command, buffer_size=buffer_size)
-            except ReadTimeout as err:
-                logger.warning('%s - retry...', err)
-                self.recv_command(command=self.config.init_cmd)
-                self.send(command=b'+ok')
-                print('retry...', end='')
-        raise ReadTimeout from err  # noqa
+        return self.recv_command(command=command, buffer_size=buffer_size)
 
     def cleaned_at_command(self, command: str, buffer_size=1024) -> str:
         logger.debug(f'cleaned_at_command({command=})')
@@ -266,6 +268,7 @@ class InverterSock:
         self.send(command=b'AT+Q\n')
         print('Goodbye ;)\n')
 
+    @backoff.on_exception(backoff.expo, ModbusNoData, **BACKOFF_DEFAULTS)
     def read(self, *, start_register: int, length: int) -> ModbusResponse:
         if self.config.verbosity > 1:
             print(f'Read {length} value(s) from start register: {hex(start_register)}')

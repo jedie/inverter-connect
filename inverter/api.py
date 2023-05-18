@@ -97,17 +97,7 @@ class Inverter:
         for parameter in self.parameters:
             name = parameter.name
 
-            result = None  # noqa
-            for try_count in range(3):
-                try:
-                    result: ModbusReadResult = self.inv_sock.read_paremeter(parameter=parameter)
-                except Exception as err:
-                    logger.warning('%s - retry...', err)
-                else:
-                    break
-            if result is None:
-                raise Exception from err  # noqa
-
+            result: ModbusReadResult = self.inv_sock.read_paremeter(parameter=parameter)
             value = InverterValue(
                 type=ValueType.READ_OUT,
                 name=name,
