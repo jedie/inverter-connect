@@ -121,6 +121,9 @@ def parse_response(data: bytes) -> RawModBusResponse:
     """
     >>> parse_response(b'+ok=01\x1003\x1004\x1001\x105E\x1000\x1000\x109A\x101D\x10\\r\\n\\r\\n')
     RawModBusResponse(prefix='+ok', data='010304015E00009A1D')
+
+    >>> parse_response(b'+ok=\\n\\rCh,SSID,BSSID,Security,Indicator\\n\\r+ok\\r\\n\\r\\n')
+    RawModBusResponse(prefix='+ok', data='Ch,SSID,BSSID,Security,Indicator')
     """
     logger.debug(f'parse_response({data=})')
     try:
@@ -129,8 +132,11 @@ def parse_response(data: bytes) -> RawModBusResponse:
         logger.warning(f'Non ASCII: {data=} ({err})')
         result = RawModBusResponse(prefix='', data=data)
     else:
-        data = data.rstrip('\r\n')
         data = data.replace('\x10', '')  # FIXME
+
+        data = data.replace('\r\n', '\n')
+        data = data.replace('\n\r', '\n')  # WTF
+
         logger.debug(f'{data=}')
         if data == '+ok':
             result = RawModBusResponse(prefix=data, data='')
@@ -141,6 +147,9 @@ def parse_response(data: bytes) -> RawModBusResponse:
                 logger.warning(f'Unexpected data: {data=}')
                 result = RawModBusResponse(prefix='', data=data)
             else:
+                data = data.strip()
+                data = data.removesuffix('\n+ok')
+                data = data.strip()
                 result = RawModBusResponse(prefix=prefix, data=data)
     logger.debug('%s', result)
     return result
@@ -220,14 +229,21 @@ class InverterSock:
         if self.config.verbosity > 1:
             print('OK', flush=True)
 
-    def recv_command(self, *, command: bytes, buffer_size=1024):
+    def recv_command(self, *, command: bytes, buffer_size=1024, max_recv=100, recv_until=None):
         self.send(command=command)
 
         if self.config.verbosity > 1:
             print('recv', end='...', flush=True)
 
+        data = b''
         try:
-            data = self.sock.recv(buffer_size)
+            for _ in range(max_recv):
+                chunk = self.sock.recv(buffer_size)
+                data += chunk
+                if recv_until is None:
+                    return data
+                elif chunk.endswith(recv_until):
+                    return data
         except (TimeoutError, socket.timeout) as err:
             raise ReadTimeout(f'Get no response from {self.config.host}: {err}')
         else:
@@ -242,7 +258,7 @@ class InverterSock:
         assert not command.endswith('\n'), f'Line ending found in: {command=}'
         command = f'AT+{command}\n'.encode()
 
-        return self.recv_command(command=command, buffer_size=buffer_size)
+        return self.recv_command(command=command, buffer_size=buffer_size, recv_until=b'\r\n\r\n')
 
     def cleaned_at_command(self, command: str, buffer_size=1024) -> str:
         logger.debug(f'cleaned_at_command({command=})')

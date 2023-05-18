@@ -322,25 +322,24 @@ def print_at_commands(ip, port, commands, verbosity: int):
 
     if not commands:
         commands = (
-            # 'KEY',  # Set/Get Device Password
+            'KEY',  # Set/Get Device Password
             'VER',
             'BVER',  # bootloader version
             'HWVER',  # hardware version
             'WEBVER',  # web version
             'YZVER',  # Firmware version
             'PING',
-            # 'YZWAKEYCTL',
-            # 'YZLOG',
-            # 'YZAPP',
-            # 'YZAPSTAT',
-            # 'YZEXPFUN',
-            # 'MID',
-            #
-            # 'CFGRD',  # current system config
-            # 'SMEM',  # system memory stat
+            'YZWAKEYCTL',
+            'YZLOG',
+            'YZAPP',
+            # 'YZAPSTAT', # (doesn't work!)
+            'YZEXPFUN',
+            'MID',
+            # 'CFGRD',  # current system config (doesn't work!)
+            # 'SMEM',  # system memory stat (doesn't work!)
             'TIME',
-            # 'ADDRESS', # Set/Get Device Address
-            # 'KEY',
+            'ADDRESS',  # Set/Get Device Address
+            'KEY',
             'NDBGS',  # Set/Get Debug Status
             'WIFI',  # Set/Get WIFI status: Power up: "WIFI=UP" Power down: "WIFI=DOWN"
             'WMODE',  # Set/Get the WIFI Operation Mode (AP or STA)
@@ -349,13 +348,12 @@ def print_at_commands(ip, port, commands, verbosity: int):
             'WSSSID',  # Set/Get the AP's SSID of WIFI STA Mode
             'WSKEY',  # Set/Get the Security Parameters of WIFI STA Mode
             'WAKEY',  # Set/Get the Security Parameters of WIFI AP Mode
-            # 'TXPWR',  # Set/Get wifi rf tx power'
+            'TXPWR',  # Set/Get wifi rf tx power'
             'WANN',  # Set/Get The WAN setting if in STA mode.
             'LANN',  # Set/Get The LAN setting if in ADHOC mode.
             'UPURL',  # Set/Get the path of remote upgrade
-            'YZAPP',
             'WAPMXSTA',  # Set/Get the Max Number Of Sta Connected to Ap
-            # 'WSCAN',  # Get The AP site Survey (only for STA Mode).
+            'WSCAN',  # Get The AP site Survey (only for STA Mode).
             'NTPTM',  # NTP date time? e.g.: "1970-1-1  0:3:9  Thur"
             'NTPSER',  # set/query NTP server, e.g.: "NTPSER=192.168.1.1"
             'NTPRF',  # NTP request interval in min (?)
@@ -383,17 +381,18 @@ def print_at_commands(ip, port, commands, verbosity: int):
         print('Fetch', end='...')
         results = []
         for command in commands:
-            print(f'[yellow]{command}', end=',')
+            print(f'[yellow]{command}', end='')
             result: str = inv_sock.cleaned_at_command(command)
             results.append(dict(command=command, result=result))
+            print(',', end='')
 
     console = get_console()
     console.print('\n')
     console.rule()
 
     table = Table(title='AT-command results')
-    table.add_column('Counter\n', justify='right')
-    table.add_column('Command\n', justify='right')
+    table.add_column('Counter', justify='right')
+    table.add_column('Command', justify='right')
     table.add_column('[green]Result', justify='left', style='green')
 
     for offset, result in enumerate(results):
