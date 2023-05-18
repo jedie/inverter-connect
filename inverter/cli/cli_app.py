@@ -338,7 +338,7 @@ def print_at_commands(ip, port, commands, verbosity: int):
             # 'CFGRD',  # current system config (doesn't work!)
             # 'SMEM',  # system memory stat (doesn't work!)
             'TIME',
-            'ADDRESS', # Set/Get Device Address
+            'ADDRESS',  # Set/Get Device Address
             'KEY',
             'NDBGS',  # Set/Get Debug Status
             'WIFI',  # Set/Get WIFI status: Power up: "WIFI=UP" Power down: "WIFI=DOWN"
@@ -352,7 +352,6 @@ def print_at_commands(ip, port, commands, verbosity: int):
             'WANN',  # Set/Get The WAN setting if in STA mode.
             'LANN',  # Set/Get The LAN setting if in ADHOC mode.
             'UPURL',  # Set/Get the path of remote upgrade
-            'YZAPP',
             'WAPMXSTA',  # Set/Get the Max Number Of Sta Connected to Ap
             'WSCAN',  # Get The AP site Survey (only for STA Mode).
             'NTPTM',  # NTP date time? e.g.: "1970-1-1  0:3:9  Thur"
@@ -392,8 +391,8 @@ def print_at_commands(ip, port, commands, verbosity: int):
     console.rule()
 
     table = Table(title='AT-command results')
-    table.add_column('Counter\n', justify='right')
-    table.add_column('Command\n', justify='right')
+    table.add_column('Counter', justify='right')
+    table.add_column('Command', justify='right')
     table.add_column('[green]Result', justify='left', style='green')
 
     for offset, result in enumerate(results):
