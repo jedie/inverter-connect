@@ -5,10 +5,10 @@ from unittest import TestCase
 
 from bx_py_utils.environ import OverrideEnviron
 from bx_py_utils.path import assert_is_file
-from bx_py_utils.test_utils.snapshot import assert_text_snapshot
+from ha_services.cli_tools.test_utils.assertion import assert_in
 from ha_services.toml_settings.api import TomlSettings
 
-from inverter.user_settings import UserSettings, migrate_old_settings
+from inverter.user_settings import SystemdServiceInfo, UserSettings, migrate_old_settings
 
 
 class UserSettingsTestCase(TestCase):
@@ -75,8 +75,25 @@ class UserSettingsTestCase(TestCase):
             assert_is_file(new_settings_path)
             new_settings_str = new_settings_path.read_text()
 
-        self.assertIn('[mqtt]', new_settings_str)
-        self.assertIn('host = "my-mosquitto.tld"', new_settings_str)
-        self.assertIn('password = "NoSecurePassword"', new_settings_str)
+        assert_in(
+            content=new_settings_str,
+            parts=(
+                '[mqtt]',
+                'host = "my-mosquitto.tld"',
+                'password = "NoSecurePassword"',
+                '[systemd]',
+                'systemd_base_path = "/etc/systemd/system"',
+                'service_file_path = "/etc/systemd/system/inverter_connect.service"',
+            ),
+        )
 
-        assert_text_snapshot(got=new_settings_str, extension='.toml')
+    def test_systemd_service_info(self):
+        user_settings = UserSettings()
+        systemd_settings = user_settings.systemd
+        self.assertIsInstance(systemd_settings, SystemdServiceInfo)
+
+        # Check some samples:
+        self.assertEqual(systemd_settings.template_context.verbose_service_name, 'Inverter Connect')
+        self.assertEqual(systemd_settings.service_slug, 'inverter_connect')
+        self.assertEqual(systemd_settings.template_context.syslog_identifier, 'inverter_connect')
+        self.assertEqual(systemd_settings.service_file_path, Path('/etc/systemd/system/inverter_connect.service'))

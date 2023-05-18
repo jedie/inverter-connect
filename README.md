@@ -19,6 +19,7 @@ The whole thing is just a learning exercise for now. We will see.
 * Bootstrap and create default user settings by just call `./cli.py edit-settings`
 * Change the settings for your needs
 * ...use the commands... ;)
+* Setup systemd service to publish the inventer values to a Home Assistant instance via MQTT
 
 Currently just clone the project and just start the cli (that will create a virtualenv and installs every dependencies)
 
@@ -41,18 +42,44 @@ Usage: ./cli.py [OPTIONS] COMMAND [ARGS]...
 │ --help      Show this message and exit.                                                          │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────╮
-│ debug-settings           Display (anonymized) MQTT server username and password                  │
-│ edit-settings            Edit the settings file. On first call: Create the default one.          │
-│ print-at-commands        Print one or more AT command values from Inverter.                      │
-│ print-values             Print all known register values from Inverter, e.g.:                    │
-│ publish-loop             Publish current data via MQTT for Home Assistant (endless loop)         │
-│ read-register            Read register(s) from the inverter                                      │
-│ set-time                 Set current date time in the inverter device.                           │
-│ test-mqtt-connection     Test connection to MQTT Server                                          │
-│ version                  Print version and exit                                                  │
+│ debug-settings        Display (anonymized) MQTT server username and password                     │
+│ edit-settings         Edit the settings file. On first call: Create the default one.             │
+│ print-at-commands     Print one or more AT command values from Inverter.                         │
+│ print-values          Print all known register values from Inverter, e.g.:                       │
+│ publish-loop          Publish current data via MQTT for Home Assistant (endless loop)            │
+│ read-register         Read register(s) from the inverter                                         │
+│ set-time              Set current date time in the inverter device.                              │
+│ systemd-debug         Print Systemd service template + context + rendered file content.          │
+│ systemd-remove        Write Systemd service file, enable it and (re-)start the service. (May     │
+│                       need sudo)                                                                 │
+│ systemd-setup         Write Systemd service file, enable it and (re-)start the service. (May     │
+│                       need sudo)                                                                 │
+│ systemd-status        Display status of systemd service. (May need sudo)                         │
+│ systemd-stop          Stops the systemd service. (May need sudo)                                 │
+│ test-mqtt-connection  Test connection to MQTT Server                                             │
+│ version               Print version and exit                                                     │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 [comment]: <> (✂✂✂ auto generated main help end ✂✂✂)
+
+
+# Setup systemd services for Home Assistant
+
+Update your settings via: `./cli.py edit-settings` and insert MQTT credentials in section `[mqtt]`
+
+Check also the config section `[systemd]` and `[systemd.template_context]`
+but normally they must not be changed ;)
+
+To verify your settings, call: `./cli.py debug-settings`
+
+To see the systemd service file content, just call: `./cli.py systemd-debug`
+
+**Note:** Some of the systemd commands, needs `sudo` because a normal user can't change systemd services!
+You will see permission errors with a hint to call the cli with sudo ;)
+
+If everything looks okay, setup and start the systemd service with: `sudo ./cli.py systemd-setup`
+
+Check the services with: `sudo ./cli.py systemd-status`
 
 
 # most important commands

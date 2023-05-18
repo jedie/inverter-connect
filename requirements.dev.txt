@@ -55,9 +55,9 @@ build==0.10.0 \
     --hash=sha256:af266720050a66c893a6096a2f410989eeac74ff9a68ba194b3f6473e8e26171 \
     --hash=sha256:d5b71264afdb5951d6704482aac78de887c80691c52b88a9ad195983ca2c9269
     # via pip-tools
-bx-py-utils==80 \
-    --hash=sha256:34c4f5e4e1199014a83139aa4285a85f84274a982f9a9a8eae056fd9848a42f7 \
-    --hash=sha256:59f3d641c516fdf75d47ea86cd84fe6405d07fc7761074dcbbb967b6962dcc09
+bx-py-utils==81 \
+    --hash=sha256:5c2e189cccbeb852b058078bc7b0a8976f5f691ee7de657a87eef43fc89fa59a \
+    --hash=sha256:fd282f9e4ed8ed2842154ffe3fdd2ca56c428023021afc5b8ff765a53c02cddb
     # via
     #   ha-services
     #   inverter-connect (pyproject.toml)
@@ -325,9 +325,9 @@ distlib==0.3.6 \
     --hash=sha256:14bad2d9b04d3a36127ac97f30b12a19268f211063d8f8ee4f47108896e11b46 \
     --hash=sha256:f35c4b692542ca110de7ef0bea44d73981caeb34ca0b9b6b2e6d7790dda8f80e
     # via virtualenv
-docutils==0.20 \
-    --hash=sha256:a428f10de4de4774389734c986a01b4af2d802d26717108b0f1b9356862937c5 \
-    --hash=sha256:f75a5a52fbcacd81b47e42888ad2b380748aaccfb3f13af0fe69deb759f01eb6
+docutils==0.20.1 \
+    --hash=sha256:96f387a2c5562db4476f09f13bbab2192e764cac08ebbf3a34a95d9b1e4a59d6 \
+    --hash=sha256:f08a4e276c3a1583a86dce3e34aba3fe04d02bba2dd51ed16106244e8a923e3b
     # via readme-renderer
 dparse==0.6.2 \
     --hash=sha256:8097076f1dd26c377f30d4745e6ec18fef42f3bf493933b842ac5bafad8c345f \
@@ -355,9 +355,9 @@ freezegun==1.2.2 \
     --hash=sha256:cd22d1ba06941384410cd967d8a99d5ae2442f57dfafeff2fda5de8dc5c05446 \
     --hash=sha256:ea1b963b993cb9ea195adbd893a48d573fda951b0da64f60883d7e988b606c9f
     # via inverter-connect (pyproject.toml)
-ha-services==0.2.0rc0 \
-    --hash=sha256:1e118fd6c6054250a3856c60ae82eb8ad6c3f025f44fa825815aa10d8739cdf4 \
-    --hash=sha256:4c61dcf62918ec5ee1656756aa4cb15aa1c9fe6c57894fcf015e6d8659968d44
+ha-services==0.2.0 \
+    --hash=sha256:744b3624d7fd79808d67e641477356bfc56291d598df789a4e64515c50b2826e \
+    --hash=sha256:a48c0e80edcd5e81d72cc46e34b1bd1feaf88aef7894b89736d08f4f432f0dc6
     # via inverter-connect (pyproject.toml)
 idna==3.4 \
     --hash=sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4 \
