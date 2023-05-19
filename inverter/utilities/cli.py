@@ -5,7 +5,8 @@ from bx_py_utils.iteration import chunk_iterable
 from rich import get_console, print  # noqa
 from rich.table import Table
 
-from inverter.data_types import InverterRegisterVersionResult, ModbusResponse
+from inverter.constants import ERROR_STR_NO_DATA
+from inverter.data_types import InverterRegisterVersionResult, InverterValue, ModbusResponse, Parameter, ValueType
 from inverter.exceptions import ModbusNoData, ModbusNoHexData
 
 
@@ -86,6 +87,47 @@ def print_inverter_versions(results: list[InverterRegisterVersionResult], title=
             str(result.info.register + offset),  # Address (dec)
             result.data_hex,  # Hex value
             f'v{result.version}',  # Human readable version
+        )
+
+    console = get_console()
+    console.print('\n')
+    console.rule()
+    console.print(table)
+
+
+def print_inverter_values(values: list[InverterValue], title='Inverter Values'):
+    table = Table(title=title)
+
+    table.add_column('Counter', justify='right')
+    table.add_column('Name', justify='right')
+    table.add_column('Value', justify='left')
+    table.add_column('Register', justify='center')
+    table.add_column('Length', justify='center')
+    table.add_column('Raw data', justify='right')
+
+    for offset, value in enumerate(values):
+        if value.value == ERROR_STR_NO_DATA:
+            value_str = f'[red]{ERROR_STR_NO_DATA}'
+        else:
+            value_str = f'[green]{value.value:>12} [blue]{value.unit}'
+
+        if value.type == ValueType.READ_OUT:
+            parameter: Parameter = value.result.parameter
+            register_str = f'[cyan]{parameter.start_register:04X}'
+            length_str = f'{parameter.length}'
+            raw_data_str = value.result.response.data_hex
+        else:
+            register_str = '-'
+            length_str = '-'
+            raw_data_str = '(Computed)'
+
+        table.add_row(
+            str(offset + 1),  # Counter
+            f'[blue]{value.name}',
+            value_str,
+            register_str,
+            length_str,
+            raw_data_str,
         )
 
     console = get_console()
