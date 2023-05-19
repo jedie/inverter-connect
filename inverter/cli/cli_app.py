@@ -1,7 +1,9 @@
 """
     CLI for usage
 """
-
+import atexit
+import datetime
+import locale
 import logging
 import sys
 import time
@@ -15,7 +17,6 @@ from ha_services.systemd.api import ServiceControl
 from ha_services.toml_settings.api import TomlSettings
 from ha_services.toml_settings.exceptions import UserSettingsNotFound
 from rich import get_console, print  # noqa
-from rich.console import Console
 from rich.pretty import pprint
 from rich.table import Table
 from rich.traceback import install as rich_traceback_install
@@ -592,16 +593,24 @@ def publish_loop(ip, port, inverter, verbosity: int):
 cli.add_command(publish_loop)
 
 
+def exit_func():
+    console = get_console()
+    console.rule(datetime.datetime.now().strftime('%c'))
+
+
 def main():
     print(f'[bold][green]{inverter.__name__}[/green] v[cyan]{inverter.__version__}')
+    locale.setlocale(locale.LC_ALL, '')
 
-    console = Console()
+    console = get_console()
     rich_traceback_install(
         width=console.size.width,  # full terminal width
         show_locals=True,
         suppress=[click, rich_click],
         max_frames=2,
     )
+
+    atexit.register(exit_func)
 
     # Execute Click CLI:
     cli.name = './cli.py'
