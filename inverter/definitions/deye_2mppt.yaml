@@ -139,3 +139,11 @@ parameters:
       rule: 5
       registers: [0x0003,0x0004,0x0005,0x0006,0x0007]
       isstr: true
+
+    - name: "Power factor"
+      class: ""
+      state_class: "measurement"
+      uom: "%"
+      scale: 1
+      rule: 1
+      registers: [0x0028]
