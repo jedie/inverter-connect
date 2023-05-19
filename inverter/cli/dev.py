@@ -9,6 +9,7 @@ from pathlib import Path
 import rich_click as click
 import tomlkit
 from bx_py_utils.path import assert_is_file
+from ha_services.cli_tools.dev_tools import _run_tox, _run_unittest_cli
 from ha_services.toml_settings.api import TomlSettings
 from ha_services.toml_settings.serialize import dataclass2toml
 from manageprojects.utilities import code_style
@@ -239,39 +240,6 @@ def update_test_snapshot_files():
 cli.add_command(update_test_snapshot_files)
 
 
-def _run_unittest_cli(extra_env=None, verbose=True, exit_after_run=True):
-    """
-    Call the origin unittest CLI and pass all args to it.
-    """
-    if extra_env is None:
-        extra_env = dict()
-
-    extra_env.update(
-        dict(
-            PYTHONUNBUFFERED='1',
-            PYTHONWARNINGS='always',
-        )
-    )
-
-    args = sys.argv[2:]
-    if not args:
-        if verbose:
-            args = ('--verbose', '--locals', '--buffer')
-        else:
-            args = ('--locals', '--buffer')
-
-    verbose_check_call(
-        sys.executable,
-        '-m',
-        'unittest',
-        *args,
-        timeout=15 * 60,
-        extra_env=extra_env,
-    )
-    if exit_after_run:
-        sys.exit(0)
-
-
 @click.command()  # Dummy command
 def test():
     """
@@ -281,11 +249,6 @@ def test():
 
 
 cli.add_command(test)
-
-
-def _run_tox():
-    verbose_check_call(sys.executable, '-m', 'tox', *sys.argv[2:])
-    sys.exit(0)
 
 
 @click.command()  # Dummy "tox" command

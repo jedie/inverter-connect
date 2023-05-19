@@ -9,7 +9,7 @@ authors = [
 ]
 requires-python = ">=3.9,<4"
 dependencies = [
-    "ha-services>=0.2.0", # https://github.com/jedie/ha-services
+    "ha-services>=0.3.0", # https://github.com/jedie/ha-services
     "backoff",  # https://github.com/litl/backoff
     "paho-mqtt",  # https://pypi.org/project/paho-mqtt/
     "msgspec",  # https://github.com/jcrist/msgspec

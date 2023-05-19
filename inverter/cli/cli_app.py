@@ -12,6 +12,7 @@ from pathlib import Path
 import rich_click
 import rich_click as click
 from bx_py_utils.path import assert_is_file
+from ha_services.cli_tools.verbosity import OPTION_KWARGS_VERBOSE, setup_logging
 from ha_services.mqtt4homeassistant.mqtt import get_connected_client
 from ha_services.systemd.api import ServiceControl
 from ha_services.toml_settings.api import TomlSettings
@@ -37,7 +38,6 @@ from inverter.utilities.cli import (
     print_inverter_versions,
     print_register,
 )
-from inverter.verbosity import OPTION_KWARGS_VERBOSE, setup_logging
 
 
 logger = logging.getLogger(__name__)
