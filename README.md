@@ -108,7 +108,7 @@ Usage: ./cli.py publish-loop [OPTIONS]
 │                                              [required]                                          │
 │    --verbosity  -v  INTEGER RANGE [0<=x<=3]  Verbosity level; Accepts integer value e.g.:        │
 │                                              "--verbose 2" or can be count e.g.: "-vv"           │
-│                                              [default: 1; 0<=x<=3]                               │
+│                                              [default: 0; 0<=x<=3]                               │
 │    --help                                    Show this message and exit.                         │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
@@ -139,7 +139,7 @@ Usage: ./cli.py print-values [OPTIONS]
 │                                              [required]                                          │
 │    --verbosity  -v  INTEGER RANGE [0<=x<=3]  Verbosity level; Accepts integer value e.g.:        │
 │                                              "--verbose 2" or can be count e.g.: "-vv"           │
-│                                              [default: 1; 0<=x<=3]                               │
+│                                              [default: 0; 0<=x<=3]                               │
 │    --help                                    Show this message and exit.                         │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
@@ -178,7 +178,7 @@ Usage: ./cli.py print-at-commands [OPTIONS] [COMMANDS]...
 │                                              [required]                                          │
 │    --verbosity  -v  INTEGER RANGE [0<=x<=3]  Verbosity level; Accepts integer value e.g.:        │
 │                                              "--verbose 2" or can be count e.g.: "-vv"           │
-│                                              [default: 1; 0<=x<=3]                               │
+│                                              [default: 0; 0<=x<=3]                               │
 │    --help                                    Show this message and exit.                         │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
@@ -212,7 +212,7 @@ Usage: ./cli.py read-register [OPTIONS] REGISTER LENGTH
 │                                              [required]                                          │
 │    --verbosity  -v  INTEGER RANGE [0<=x<=3]  Verbosity level; Accepts integer value e.g.:        │
 │                                              "--verbose 2" or can be count e.g.: "-vv"           │
-│                                              [default: 1; 0<=x<=3]                               │
+│                                              [default: 0; 0<=x<=3]                               │
 │    --help                                    Show this message and exit.                         │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
