@@ -1,7 +1,7 @@
 import os
 import unittest.util
 
-from inverter.verbosity import MAX_LOG_LEVEL, setup_logging
+from ha_services.cli_tools.verbosity import MAX_LOG_LEVEL, setup_logging
 
 
 # Hacky way to expand the failed test output:
