@@ -1,6 +1,7 @@
 import logging
 
 import click
+from rich.logging import RichHandler
 
 
 OPTION_KWARGS_VERBOSE = dict(
@@ -13,16 +14,18 @@ OPTION_KWARGS_VERBOSE = dict(
 
 
 def setup_logging(*, verbosity: int):
-    log_format = '%(levelname)s: %(message)s'
+    log_format = '%(message)s'
     if verbosity == 0:
         level = logging.ERROR
     elif verbosity == 1:
         level = logging.WARNING
     elif verbosity == 2:
         level = logging.INFO
-        log_format = '%(asctime)s %(levelname)-8s %(message)s'
+        log_format = '%(asctime)s %(message)s'
     else:
         level = logging.DEBUG
-        log_format = '%(asctime)s %(levelname)-8s (%(name)s) %(message)s'
+        log_format = '%(asctime)s (%(name)s) %(message)s'
 
-    logging.basicConfig(level=level, format=log_format)
+    if verbosity:
+        print(f'Set log level to: {logging.getLevelName(level)}')
+    logging.basicConfig(level=level, format=log_format, datefmt='[%X]', handlers=[RichHandler()], force=True)
