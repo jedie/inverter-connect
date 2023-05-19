@@ -120,10 +120,10 @@ def parameter2modbus_at_command(
 def parse_response(data: bytes) -> RawModBusResponse:
     """
     >>> parse_response(b'+ok=01\x1003\x1004\x1001\x105E\x1000\x1000\x109A\x101D\x10\\r\\n\\r\\n')
-    RawModBusResponse(prefix='+ok', data='010304015E00009A1D')
+    RawModBusResponse(prefix='+ok=', data='010304015E00009A1D')
 
-    >>> parse_response(b'+ok=\\n\\rCh,SSID,BSSID,Security,Indicator\\n\\r+ok\\r\\n\\r\\n')
-    RawModBusResponse(prefix='+ok', data='Ch,SSID,BSSID,Security,Indicator')
+    >>> parse_response(b'-1\\n\\n+ok=214028\\n\\r+ok\\r\\n\\r\\n')
+    RawModBusResponse(prefix='-1\\n\\n+ok=', data='214028')
     """
     logger.debug(f'parse_response({data=})')
     try:
@@ -136,21 +136,19 @@ def parse_response(data: bytes) -> RawModBusResponse:
 
         data = data.replace('\r\n', '\n')
         data = data.replace('\n\r', '\n')  # WTF
+        data = data.strip()
 
         logger.debug(f'{data=}')
         if data == '+ok':
             result = RawModBusResponse(prefix=data, data='')
+        elif '+ok=' in data:
+            prefix, seperator, data = data.partition('+ok=')
+            data = data.removesuffix('\n+ok')
+            data = data.strip()
+            result = RawModBusResponse(prefix=prefix + seperator, data=data)
         else:
-            try:
-                prefix, data = data.split('=', 1)
-            except ValueError:
-                logger.warning(f'Unexpected data: {data=}')
-                result = RawModBusResponse(prefix='', data=data)
-            else:
-                data = data.strip()
-                data = data.removesuffix('\n+ok')
-                data = data.strip()
-                result = RawModBusResponse(prefix=prefix, data=data)
+            logger.warning(f'Unexpected data: {data=}')
+            result = RawModBusResponse(prefix='', data=data)
     logger.debug('%s', result)
     return result
 
