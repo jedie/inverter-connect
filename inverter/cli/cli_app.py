@@ -16,6 +16,7 @@ from ha_services.toml_settings.api import TomlSettings
 from ha_services.toml_settings.exceptions import UserSettingsNotFound
 from rich import get_console, print  # noqa
 from rich.console import Console
+from rich.pretty import pprint
 from rich.table import Table
 from rich.traceback import install as rich_traceback_install
 from rich_click import RichGroup
@@ -24,12 +25,17 @@ import inverter
 from inverter import constants
 from inverter.api import Inverter, fetch_inverter_versions, set_current_time
 from inverter.connection import InverterSock
-from inverter.constants import ERROR_STR_NO_DATA, SETTINGS_DIR_NAME, SETTINGS_FILE_NAME
-from inverter.data_types import InverterRegisterVersionInfo, Parameter, ValueType
+from inverter.constants import SETTINGS_DIR_NAME, SETTINGS_FILE_NAME
+from inverter.data_types import InverterRegisterVersionInfo
 from inverter.exceptions import ReadInverterError
 from inverter.publish_loop import publish_forever
 from inverter.user_settings import SystemdServiceInfo, UserSettings, make_config, migrate_old_settings
-from inverter.utilities.cli import convert_address_option, print_inverter_versions, print_register
+from inverter.utilities.cli import (
+    convert_address_option,
+    print_inverter_values,
+    print_inverter_versions,
+    print_register,
+)
 from inverter.verbosity import OPTION_KWARGS_VERBOSE, setup_logging
 
 
@@ -243,7 +249,7 @@ def print_values(ip, port, inverter, verbosity: int):
     """
     Print all known register values from Inverter, e.g.:
 
-    .../inverter-connect$ ./cli.py print-values 192.168.123.456
+    .../inverter-connect$ ./cli.py print-values
     """
     setup_logging(verbosity=verbosity)
 
@@ -264,27 +270,15 @@ def print_values(ip, port, inverter, verbosity: int):
             print(f'[red]{err}')
             sys.exit(1)
 
+        print('Fetch', end='...')
+        values = []
         for value in inverter:
-            print(f'\t* [yellow]{value.name:<31}[/yellow]:', end=' ')
-            if value.value == ERROR_STR_NO_DATA:
-                color = 'red'
-                msg = ERROR_STR_NO_DATA
-            else:
-                color = 'green'
-                msg = f'{value.value} {value.unit}'
-            print(f'[{color}]{msg:<11}[/{color}]', end=' ')
+            print(f'[yellow]{value.name}[/yellow],', end='')
+            values.append(value)
 
-            if value.type == ValueType.READ_OUT:
-                parameter: Parameter = value.result.parameter
-                print(
-                    f'(Register: [cyan]{parameter.start_register:04X}[/cyan], length:'
-                    f' [blue]{parameter.length}[/blue])'
-                )
-            elif value.type == ValueType.COMPUTED:
-                print('(Computed)')
-
-            if verbosity:
-                print()
+    if verbosity > 1:
+        pprint(values)
+    print_inverter_values(values)
 
 
 cli.add_command(print_values)
@@ -301,20 +295,20 @@ def print_at_commands(ip, port, commands, verbosity: int):
 
     Use all known AT commands, if no one is given, e.g.:
 
-    .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456
+    .../inverter-connect$ ./cli.py print-at-commands
 
     Or specify one or more AT-commands, e.g.:
 
-    .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 WEBVER
-    .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 WEBVER WEBU
+    .../inverter-connect$ ./cli.py print-at-commands WEBVER
+    .../inverter-connect$ ./cli.py print-at-commands WEBVER WEBU
 
     e.g.: Set NTP server, enable NTP and check the values:
 
-    .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 NTPSER=192.168.1.1 NTPEN=on NTPSER NTPEN
+    .../inverter-connect$ ./cli.py print-at-commands NTPSER=192.168.1.1 NTPEN=on NTPSER NTPEN
 
     wait a while and request the current date time:
 
-    .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 NTPTM
+    .../inverter-connect$ ./cli.py print-at-commands NTPTM
 
     (Note: The prefix "AT+" will be added to every command)
     """
@@ -385,6 +379,9 @@ def print_at_commands(ip, port, commands, verbosity: int):
             result: str = inv_sock.cleaned_at_command(command)
             results.append(dict(command=command, result=result))
             print(',', end='')
+
+    if verbosity > 1:
+        pprint(results)
 
     console = get_console()
     console.print('\n')

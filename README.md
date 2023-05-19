@@ -127,7 +127,7 @@ Help from `./cli.py print-values --help` Looks like:
 Usage: ./cli.py print-values [OPTIONS]
 
  Print all known register values from Inverter, e.g.:
- .../inverter-connect$ ./cli.py print-values 192.168.123.456
+ .../inverter-connect$ ./cli.py print-values
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
 │ *  --ip             TEXT                     IP address of your inverter [required]              │
@@ -162,15 +162,14 @@ Usage: ./cli.py print-at-commands [OPTIONS] [COMMANDS]...
 
  Print one or more AT command values from Inverter.
  Use all known AT commands, if no one is given, e.g.:
- .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456
+ .../inverter-connect$ ./cli.py print-at-commands
  Or specify one or more AT-commands, e.g.:
- .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 WEBVER .../inverter-connect$
- ./cli.py print-at-commands 192.168.123.456 WEBVER WEBU
+ .../inverter-connect$ ./cli.py print-at-commands WEBVER .../inverter-connect$ ./cli.py
+ print-at-commands WEBVER WEBU
  e.g.: Set NTP server, enable NTP and check the values:
- .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 NTPSER=192.168.1.1 NTPEN=on
- NTPSER NTPEN
+ .../inverter-connect$ ./cli.py print-at-commands NTPSER=192.168.1.1 NTPEN=on NTPSER NTPEN
  wait a while and request the current date time:
- .../inverter-connect$ ./cli.py print-at-commands 192.168.123.456 NTPTM
+ .../inverter-connect$ ./cli.py print-at-commands NTPTM
  (Note: The prefix "AT+" will be added to every command)
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮

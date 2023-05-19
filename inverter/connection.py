@@ -208,11 +208,11 @@ class InverterSock:
         print(self.inverter_info)
         print()
 
+    @backoff.on_exception(backoff.expo, ReadTimeout, **BACKOFF_DEFAULTS)
     def connect(self) -> None:
-        assert self.sock is None
         logger.info(f'Connect to {self.config.host}:{self.config.port}...')
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.settimeout(self.config.socket_timeout)
 
         self.init_inventer()
