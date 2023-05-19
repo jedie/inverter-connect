@@ -57,7 +57,11 @@ class ReadmeTestCase(BaseTestCase):
         assert_rich_click_no_color(width=TERM_WIDTH)
 
     def invoke_cli(self, *args):
-        return self.cli_mock.invoke(cli_bin=PACKAGE_ROOT / 'cli.py', args=args, strip_line_prefix='Usage: ')
+        stdout = self.cli_mock.invoke(cli_bin=PACKAGE_ROOT / 'cli.py', args=args, strip_line_prefix='Usage: ')
+
+        # Remove last line:
+        stdout = '\n'.join(stdout.splitlines()[:-1])
+        return stdout.rstrip()
 
     def invoke_dev_cli(self, *args):
         return self.cli_mock.invoke(cli_bin=PACKAGE_ROOT / 'dev-cli.py', args=args, strip_line_prefix='Usage: ')
