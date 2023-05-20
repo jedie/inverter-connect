@@ -2,6 +2,7 @@ from __future__ import annotations
 
 
 from bx_py_utils.iteration import chunk_iterable
+from packaging.version import Version
 from rich import get_console, print  # noqa
 from rich.table import Table
 
@@ -106,8 +107,13 @@ def print_inverter_values(values: list[InverterValue], title='Inverter Values'):
     table.add_column('Raw data', justify='right')
 
     for offset, value in enumerate(values):
-        if value.value == ERROR_STR_NO_DATA:
+        if value.value is None:
+            value_str = '[yellow]<no value>'
+        elif value.value == ERROR_STR_NO_DATA:
             value_str = f'[red]{ERROR_STR_NO_DATA}'
+        elif isinstance(value.value, Version):
+            value_str = f'v{value.value}'
+            value_str = f'[green]{value_str:>12}'
         else:
             value_str = f'[green]{value.value:>12} [blue]{value.unit}'
 

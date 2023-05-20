@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 
+from packaging.version import Version
+
 
 logger = logging.getLogger(__name__)
 
@@ -57,20 +59,35 @@ def parse_swapped_number(*, data_hex: str, scale: int | float, offset: int = Non
     4.3
     >>> parse_swapped_number(data_hex='01900000', scale=0.1)
     40.0
+    >>> parse_swapped_number(data_hex='002b', scale=0.1)
+    4.3
     """
     assert not lookup
-    assert len(data_hex) == 8, f'Wrong len {len(data_hex)}: {data_hex=}'
     logger.debug(f'{data_hex=}')
 
-    # '1234abcd' -> 'abcd1234'
-    swapped_data_hex = data_hex[-4:] + data_hex[:4]
-    logger.debug(f'{swapped_data_hex=}')
-    return hex2int(data_hex=swapped_data_hex, scale=scale, offset=offset)
+    length = len(data_hex)
+    if length == 8:
+        # '1234abcd' -> 'abcd1234'
+        data_hex = data_hex[-4:] + data_hex[:4]
+        logger.debug(f'Swap to: {data_hex=}')
+    elif length != 4:
+        AssertionError(f'Wrong len {length}: {data_hex=}')
+    return hex2int(data_hex=data_hex, scale=scale, offset=offset)
 
 
 def parse_string(*, data_hex: str, scale, offset, lookup):
     return data_hex
 
 
+def parse_version_string(*, data_hex: str, scale=None, offset=None, lookup=None) -> Version:
+    """
+    >>> parse_version_string(data_hex='0114')
+    <Version('0.1.1.4')>
+    """
+    version = Version('.'.join(number for number in data_hex))
+    return version
+
+
 def debug_converter(*, data_hex: str, scale, offset, lookup):
-    print(f'Debug converter: {data_hex=}')
+    print(f'Debug converter: {data_hex=} {scale=} {offset=} {lookup=}')
+    return f'<raw hex: {data_hex}>'
