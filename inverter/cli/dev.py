@@ -8,7 +8,6 @@ from pathlib import Path
 
 import rich_click as click
 import tomlkit
-from bx_py_utils.path import assert_is_file
 from ha_services.cli_tools.dev_tools import _run_tox, _run_unittest_cli
 from ha_services.toml_settings.api import TomlSettings
 from ha_services.toml_settings.serialize import dataclass2toml
@@ -22,15 +21,12 @@ from tomlkit import TOMLDocument
 
 import inverter
 from inverter import constants
-from inverter.constants import SETTINGS_DIR_NAME, SETTINGS_FILE_NAME
+from inverter.constants import PACKAGE_ROOT, SETTINGS_DIR_NAME, SETTINGS_FILE_NAME
 from inverter.user_settings import UserSettings
 
 
 logger = logging.getLogger(__name__)
 
-
-PACKAGE_ROOT = Path(inverter.__file__).parent.parent
-assert_is_file(PACKAGE_ROOT / 'pyproject.toml')
 
 OPTION_ARGS_DEFAULT_TRUE = dict(is_flag=True, show_default=True, default=True)
 OPTION_ARGS_DEFAULT_FALSE = dict(is_flag=True, show_default=True, default=False)

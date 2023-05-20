@@ -10,8 +10,7 @@ from ha_services.toml_settings.test_utils.cli_mock import TomlSettingsCliMock
 from manageprojects.tests.base import BaseTestCase
 
 from inverter import constants
-from inverter.cli.cli_app import PACKAGE_ROOT
-from inverter.constants import SETTINGS_DIR_NAME, SETTINGS_FILE_NAME
+from inverter.constants import PACKAGE_ROOT, SETTINGS_DIR_NAME, SETTINGS_FILE_NAME
 from inverter.user_settings import UserSettings
 
 

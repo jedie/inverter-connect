@@ -11,7 +11,6 @@ from pathlib import Path
 
 import rich_click
 import rich_click as click
-from bx_py_utils.path import assert_is_file
 from ha_services.cli_tools.verbosity import OPTION_KWARGS_VERBOSE, setup_logging
 from ha_services.mqtt4homeassistant.mqtt import get_connected_client
 from ha_services.systemd.api import ServiceControl
@@ -42,9 +41,6 @@ from inverter.utilities.cli import (
 
 logger = logging.getLogger(__name__)
 
-
-PACKAGE_ROOT = Path(inverter.__file__).parent.parent
-assert_is_file(PACKAGE_ROOT / 'pyproject.toml')
 
 OPTION_ARGS_DEFAULT_TRUE = dict(is_flag=True, show_default=True, default=True)
 OPTION_ARGS_DEFAULT_FALSE = dict(is_flag=True, show_default=True, default=False)
@@ -101,13 +97,15 @@ toml_settings = TomlSettings(
     dir_name=SETTINGS_DIR_NAME,
     file_name=SETTINGS_FILE_NAME,
     settings_dataclass=UserSettings(),
+    not_exist_exit_code=None,  # Don't sys.exit() if settings file not present, yet.
 )
 migrate_old_settings(toml_settings)  # TODO: Remove in the Future
 
 try:
     user_settings: UserSettings = toml_settings.get_user_settings(debug=True)
 except UserSettingsNotFound:
-    sys.exit(1)
+    # Use default one
+    user_settings = UserSettings()
 
 
 option_kwargs_ip = dict(
