@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import Iterable
 
 import yaml
@@ -7,13 +8,25 @@ from bx_py_utils.dict_utils import pluck
 from bx_py_utils.path import assert_is_file
 
 from inverter.data_types import Config, Parameter
-from inverter.utilities.modbus_converter import debug_converter, parse_number, parse_string, parse_swapped_number
+from inverter.utilities.modbus_converter import (
+    debug_converter,
+    parse_number,
+    parse_string,
+    parse_swapped_number,
+    parse_version_string,
+)
 
 
-rule2converter = {
+logger = logging.getLogger(__name__)
+
+
+RULE2CONVERTER = {
     1: parse_number,
+    2: parse_number,
     3: parse_swapped_number,
     5: parse_string,
+    7: parse_version_string,
+    # TODO: 8: parse_datetime,
 }
 
 
@@ -56,7 +69,11 @@ def get_parameter(*, config: Config) -> Iterable[Parameter]:
             if lookup := item.get('lookup'):
                 lookup = convert_lookup(lookup)
 
-            converter_func = rule2converter.get(rule, debug_converter)
+            try:
+                converter_func = RULE2CONVERTER[rule]
+            except KeyError:
+                logger.error('No rule converter for: %r', rule)
+                converter_func = debug_converter
 
             parameter = Parameter(
                 start_register=registers[0],
