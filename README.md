@@ -147,7 +147,8 @@ Usage: ./cli.py print-values [OPTIONS]
 
 Example output of `print-values` call:
 
-![print-values](https://raw.githubusercontent.com/jedie/jedie.github.io/master/screenshots/inverter-connect/2023-04-28_08-55.png "2023-04-28_08-55.png")
+![print-values](https://raw.githubusercontent.com/jedie/jedie.github.io/master/screenshots/inverter-connect/2023-05-20_13-48.png "2023-05-20_13-48.png")
+
 
 ----
 
@@ -279,3 +280,4 @@ https://github.com/StephanJoubert/home_assistant_solarman/tree/main/custom_compo
 # various links
 
 * Discussion: https://www.photovoltaikforum.com/thread/201065-inverter-connect-daten-vom-deye-wechselrichter-per-python-abrufen/ (de)
+* Screenshots: https://github.com/jedie/jedie.github.io/tree/master/screenshots/inverter-connect
