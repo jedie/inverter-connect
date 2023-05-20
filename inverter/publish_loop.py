@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 def publish_forever(*, config: Config, verbosity):
+    start_time = time.monotonic()
+
     mqtt_settings = config.mqtt_settings
     try:
         publisher = HaMqttPublisher(settings=mqtt_settings, verbosity=verbosity, config_count=1)
@@ -64,6 +66,16 @@ def publish_forever(*, config: Config, verbosity):
                     except ReadInverterError as err:
                         print(f'[red]{err}')
                     else:
+                        values.append(
+                            HaValue(
+                                name='Loop Running Time',
+                                value=int(time.monotonic() - start_time),
+                                device_class='',
+                                state_class='measurement',
+                                unit='sec.',
+                            )
+                        )
+
                         values = HaValues(
                             device_name=str(inverter_info.serial),
                             values=values,
