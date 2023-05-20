@@ -6,6 +6,7 @@ from ha_services.cli_tools.rich_utils import human_error
 from ha_services.mqtt4homeassistant.converter import values2mqtt_payload
 from ha_services.mqtt4homeassistant.data_classes import HaValue, HaValues
 from ha_services.mqtt4homeassistant.mqtt import HaMqttPublisher
+from packaging.version import Version
 from rich import print  # noqa
 
 from inverter.api import Inverter
@@ -39,16 +40,20 @@ def publish_forever(*, config: Config, verbosity):
                         values = []
                         for value in inverter:
                             assert isinstance(value, InverterValue), f'{value!r}'
-                            if value.value == ERROR_STR_NO_DATA:
+
+                            ha_value = value.value
+                            if ha_value == ERROR_STR_NO_DATA:
                                 # Don't send a MQTT message if one of the values are missing:
                                 raise ReadInverterError(f'Missing data for {value.name}')
+                            elif isinstance(value.value, Version):
+                                ha_value = str(value.value)
 
                             daily_production_reset(value)
 
                             values.append(
                                 HaValue(
                                     name=value.name,
-                                    value=value.value,
+                                    value=ha_value,
                                     device_class=value.device_class,
                                     state_class=value.state_class,
                                     unit=value.unit,
