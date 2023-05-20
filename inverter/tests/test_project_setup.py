@@ -1,14 +1,16 @@
 import subprocess
+import sys
 from unittest import TestCase
 
 from bx_py_utils.path import assert_is_file
 from manageprojects.test_utils.click_cli_utils import subprocess_cli
 from manageprojects.test_utils.project_setup import check_editor_config, get_py_max_line_length
 from manageprojects.utilities import code_style
+from manageprojects.utilities.subprocess_utils import verbose_check_output
 from packaging.version import Version
 
 from inverter import __version__
-from inverter.cli.cli_app import PACKAGE_ROOT
+from inverter.constants import PACKAGE_ROOT
 
 
 class ProjectSetupTestCase(TestCase):
@@ -29,11 +31,11 @@ class ProjectSetupTestCase(TestCase):
         self.assertEqual(str(version), __version__)
 
         # The "app" cli:
-        output = subprocess.check_output([self.app_cli_bin, 'version'], text=True)
+        output = verbose_check_output(sys.executable, self.app_cli_bin, 'version')
         self.assertIn(f'inverter v{__version__}', output)
 
         # The "development" cli:
-        output = subprocess.check_output([self.dev_cli_bin, 'version'], text=True)
+        output = verbose_check_output(sys.executable, self.dev_cli_bin, 'version')
         self.assertIn(f'inverter v{__version__}', output)
 
     def test_code_style(self):
