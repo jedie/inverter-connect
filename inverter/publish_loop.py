@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 def publish_forever(*, config: Config, verbosity):
     mqtt_settings = config.mqtt_settings
     try:
-        publisher = HaMqttPublisher(settings=mqtt_settings, verbose=bool(verbosity), config_count=1)
+        publisher = HaMqttPublisher(settings=mqtt_settings, verbosity=verbosity, config_count=1)
     except Exception as err:
         human_error(message='given {mqtt_settings!r} is wrong?!?', exception=err)
 
