@@ -359,9 +359,9 @@ freezegun==1.2.2 \
     --hash=sha256:cd22d1ba06941384410cd967d8a99d5ae2442f57dfafeff2fda5de8dc5c05446 \
     --hash=sha256:ea1b963b993cb9ea195adbd893a48d573fda951b0da64f60883d7e988b606c9f
     # via inverter-connect (pyproject.toml)
-ha-services==0.3.0 \
-    --hash=sha256:29db312edc9495aa05f78b1bdca5b6cce3369b37090f0c20fb5fde3a588d10ec \
-    --hash=sha256:a4a80b5a68161823d1d67e923cc72a35e054c984bdec9890a63c8ef0acaee08d
+ha-services==0.3.2 \
+    --hash=sha256:1dd5534d0ddbbd2ba3ae25f4e8243c6b3397bb15409d43585c5f7c762f923329 \
+    --hash=sha256:8d4c0fea0acfcf1a2f3317f03b7533ea05ed27fc061a25aca42ced89c58cd1c6
     # via inverter-connect (pyproject.toml)
 idna==3.4 \
     --hash=sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4 \
