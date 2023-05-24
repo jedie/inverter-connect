@@ -63,6 +63,7 @@ class ModbusReadResult:
 
 @dataclasses.dataclass
 class Config:
+    compact: bool
     verbosity: int
     host: str
     port: int
