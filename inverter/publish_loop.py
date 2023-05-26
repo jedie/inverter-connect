@@ -1,6 +1,5 @@
 import logging
 import time
-from datetime import datetime
 
 from ha_services.cli_tools.rich_utils import human_error
 from ha_services.mqtt4homeassistant.converter import values2mqtt_payload
@@ -11,8 +10,8 @@ from rich import print  # noqa
 
 from inverter.api import Inverter
 from inverter.constants import ERROR_STR_NO_DATA
-from inverter.daily_reset import DailyProductionReset
-from inverter.data_types import Config, InverterInfo, InverterValue, ResetState
+from inverter.daily_reset import DailyProductionReset, DailyProductionResetState
+from inverter.data_types import Config, InverterInfo, InverterValue
 from inverter.exceptions import ReadInverterError, ReadTimeout, ValidationError
 
 
@@ -28,7 +27,7 @@ def publish_forever(*, config: Config, verbosity):
     except Exception as err:
         human_error(message='given {mqtt_settings!r} is wrong?!?', exception=err)
 
-    reset_state = ResetState(started=datetime.now())
+    reset_state = DailyProductionResetState(config_path=config.config_path)
 
     while True:
         try:
