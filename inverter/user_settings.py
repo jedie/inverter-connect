@@ -110,7 +110,7 @@ def migrate_old_settings(toml_settings: TomlSettings):  # TODO: Remove in the Fu
             logging.debug('No old settings file found here: %s', v2_settings_path)
 
 
-def make_config(*, user_settings: UserSettings, ip, port, verbosity, compact, inverter=None) -> Config:
+def make_config(*, user_settings: UserSettings, ip, port, verbosity, compact, config_path=None, inverter=None) -> Config:
     # "Validate" ip address:
     try:
         result = socket.gethostbyname(ip)
@@ -126,4 +126,5 @@ def make_config(*, user_settings: UserSettings, ip, port, verbosity, compact, in
         port=port,
         mqtt_settings=user_settings.mqtt,
         inverter_name=inverter,
+        config_path=config_path,
     )

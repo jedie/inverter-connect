@@ -586,6 +586,7 @@ def publish_loop(ip, port, inverter, verbosity: int):
 
     config = make_config(
         user_settings=user_settings,
+        config_path=toml_settings.file_path.parent,  # e.g.: ~/.config/inverter-connect/
         verbosity=verbosity,
         ip=ip,
         port=port,

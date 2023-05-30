@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import dataclasses
 import logging
-from datetime import datetime, time
 from enum import Enum
 from pathlib import Path
 from typing import Callable
@@ -76,8 +75,7 @@ class Config:
     init_cmd: bytes = b'WIFIKIT-214028-READ'
 
     daily_production_name: str = 'Daily Production'  # Must be the same as in yaml config!
-    reset_needed_start: time = time(hour=1)
-    reset_needed_end: time = time(hour=3)
+    config_path: Path = None  # e.g.: ~/.config/inverter-connect/
 
     # Will be set by post init:
     definition_file_path: Path = None
@@ -101,15 +99,6 @@ class Config:
 
         if self.verbosity > 1:
             print(self)
-
-
-@dataclasses.dataclass
-class ResetState:
-    started: datetime
-    set_time_count: int = 0
-    successful_count: int = 0
-    last_success_dt: datetime = None
-    reset_needed: bool = False
 
 
 @dataclasses.dataclass
