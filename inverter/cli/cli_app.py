@@ -129,6 +129,13 @@ option_kwargs_inverter_name = dict(
     help='Prefix of yaml config files in inverter/definitions/',
     show_default=True,
 )
+option_kwargs_compact = dict(
+    required=False,
+    default=False,
+    help='Only show the values concerning power generation',
+    is_flag=True,
+    show_default=False,
+)
 
 
 @click.command()
@@ -244,7 +251,8 @@ cli.add_command(systemd_stop)
 @click.option('--port', **option_kwargs_port)
 @click.option('--inverter', **option_kwargs_inverter_name)
 @click.option('-v', '--verbosity', **OPTION_KWARGS_VERBOSE)
-def print_values(ip, port, inverter, verbosity: int):
+@click.option('-c', '--compact', **option_kwargs_compact)
+def print_values(ip, port, inverter, verbosity: int, compact: bool):
     """
     Print all known register values from Inverter, e.g.:
 
@@ -259,6 +267,7 @@ def print_values(ip, port, inverter, verbosity: int):
         verbosity=verbosity,
         ip=ip,
         port=port,
+        compact=compact,
         inverter=inverter,
     )
 
