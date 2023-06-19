@@ -1,0 +1,8 @@
+validators:
+    - name: "AC Temperature"
+      type: "float"
+      min_value: -10
+      max_value: 60
+
+
+
