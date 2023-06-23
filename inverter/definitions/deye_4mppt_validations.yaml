@@ -1,0 +1,30 @@
+validators:
+    - name: "Radiator Temperature"
+      type: "float"
+      min_value: -9.9
+      max_value: 60
+
+    - name: "Total AC Output Power (Active)"
+      type: "int"
+      min_value: 0
+      max_value: 2000
+
+    - name: "PV1 Power"
+      type: "int"
+      min_value: 0
+      max_value: 500
+
+    - name: "PV2 Power"
+      type: "int"
+      min_value: 0
+      max_value: 500
+
+    - name: "PV3 Power"
+      type: "int"
+      min_value: 0
+      max_value: 500
+
+    - name: "PV4 Power"
+      type: "int"
+      min_value: 0
+      max_value: 500
