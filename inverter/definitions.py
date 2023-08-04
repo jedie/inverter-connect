@@ -51,6 +51,9 @@ def get_parameter(*, config: Config) -> Iterable[Parameter]:
     parameters = []
     for group_data in data:
         group_name = group_data['group']
+        if config.compact and group_name not in 'solar':
+            # compact profile only shows data from yaml.config group solar
+            continue
         for item in group_data['items']:
             # example = {
             #     'name': 'PV1 Voltage',
