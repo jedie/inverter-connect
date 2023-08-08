@@ -12,10 +12,16 @@ astor==0.8.1 \
     --hash=sha256:070a54e890cefb5b3739d19f30f5a5ec840ffc9c50ffa7d23cc9fc1a38ebbfc5 \
     --hash=sha256:6a6effda93f4e1ce9f618779b2dd1d9d84f1e32812c23a29b3fff6fd7f63fa5e
     # via flynt
+autoflake==2.2.0 \
+    --hash=sha256:62e1f74a0fdad898a96fee6f99fe8241af90ad99c7110c884b35855778412251 \
+    --hash=sha256:de409b009a34c1c2a7cc2aae84c4c05047f9773594317c6a6968bd497600d4a0
+    # via manageprojects
 autopep8==2.0.2 \
     --hash=sha256:86e9303b5e5c8160872b2f5ef611161b2893e9bfe8ccc7e2f76385947d57a2f1 \
     --hash=sha256:f9849cdd62108cb739dbcdbfb7fdcc9a30d1b63c4cc3e1c1f893b5360941b61c
-    # via inverter-connect (pyproject.toml)
+    # via
+    #   inverter-connect (pyproject.toml)
+    #   manageprojects
 backoff==2.2.1 \
     --hash=sha256:03f829f5bb1923180821643f8753b0502c3b682293992485b0eef2807afa5cba \
     --hash=sha256:63579f9a0628e06278f7e47b7d7d5b6ce20dc65c5e96a6f3ca99a6adca0396e8
@@ -235,7 +241,9 @@ click==8.1.6 \
 codespell==2.2.5 \
     --hash=sha256:6d9faddf6eedb692bf80c9a94ec13ab4f5fb585aabae5f3750727148d7b5be56 \
     --hash=sha256:efa037f54b73c84f7bd14ce8e853d5f822cdd6386ef0ff32e957a3919435b9ec
-    # via inverter-connect (pyproject.toml)
+    # via
+    #   inverter-connect (pyproject.toml)
+    #   manageprojects
 colorama==0.4.6 \
     --hash=sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44 \
     --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
@@ -334,7 +342,9 @@ cryptography==41.0.3 \
 darker[color,flynt,isort]==1.7.2 \
     --hash=sha256:ec5b7c382d9537611c164f3ecca2e1b8a7923bc5a02bf22f6e7f6c8bcbdf593a \
     --hash=sha256:ec9d130ab2a0f7fa49ab68a08fd231a5bec66147ecbbf94c92a1f33d97b5ef6f
-    # via inverter-connect (pyproject.toml)
+    # via
+    #   inverter-connect (pyproject.toml)
+    #   manageprojects
 distlib==0.3.7 \
     --hash=sha256:2e24928bc811348f0feb63014e97aaae3037f2cf48712d51ae61df7fd6075057 \
     --hash=sha256:9dafe54b34a028eafd95039d5e5d4851a13734540f1331060d31c9916e7147a8
@@ -350,7 +360,9 @@ dparse==0.6.3 \
 editorconfig==0.12.3 \
     --hash=sha256:57f8ce78afcba15c8b18d46b5170848c88d56fd38f05c2ec60dbbfcb8996e89e \
     --hash=sha256:6b0851425aa875b08b16789ee0eeadbd4ab59666e9ebe728e526314c4a2e52c1
-    # via inverter-connect (pyproject.toml)
+    # via
+    #   inverter-connect (pyproject.toml)
+    #   manageprojects
 filelock==3.12.2 \
     --hash=sha256:002740518d8aa59a26b0c76e10fb8c6e15eae825d34b6fdf670333fd7b938d81 \
     --hash=sha256:cbb791cdea2a72f23da6ac5b5269ab0a0d161e9ef0100e653b69049a7706d1ec
@@ -360,7 +372,9 @@ filelock==3.12.2 \
 flake8==6.1.0 \
     --hash=sha256:d5b3857f07c030bdb5bf41c7f53799571d75c4491748a3adcd47de929e34cd23 \
     --hash=sha256:ffdfce58ea94c6580c77888a86506937f9a1a227dfcd15f245d694ae20a6b6e5
-    # via inverter-connect (pyproject.toml)
+    # via
+    #   inverter-connect (pyproject.toml)
+    #   manageprojects
 flynt==0.77 \
     --hash=sha256:2863ac8ec19d6ec8d29e760546e6ced644baf6dff3c7cdc77e03abbd29b80f14 \
     --hash=sha256:2bd1b37043ad88a3f3c3c34a76fc0b64d24e5f03d36ea6b48cb69cc642bff17e
@@ -369,9 +383,9 @@ freezegun==1.2.2 \
     --hash=sha256:cd22d1ba06941384410cd967d8a99d5ae2442f57dfafeff2fda5de8dc5c05446 \
     --hash=sha256:ea1b963b993cb9ea195adbd893a48d573fda951b0da64f60883d7e988b606c9f
     # via inverter-connect (pyproject.toml)
-ha-services==0.3.2 \
-    --hash=sha256:1dd5534d0ddbbd2ba3ae25f4e8243c6b3397bb15409d43585c5f7c762f923329 \
-    --hash=sha256:8d4c0fea0acfcf1a2f3317f03b7533ea05ed27fc061a25aca42ced89c58cd1c6
+ha-services==0.3.4 \
+    --hash=sha256:6aec86c901ebb2b26775311ce6c15a23a8156248211d73c88174c458ea1b8d69 \
+    --hash=sha256:b525b44ec1372a40a6438574efbf371db322028a33fb037319a72bc33a676b8f
     # via inverter-connect (pyproject.toml)
 idna==3.4 \
     --hash=sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4 \
@@ -405,12 +419,10 @@ keyring==24.2.0 \
     --hash=sha256:4901caaf597bfd3bbd78c9a0c7c4c29fcd8310dab2cffefe749e916b6527acd6 \
     --hash=sha256:ca0746a19ec421219f4d713f848fa297a661a8a8c1504867e55bfb5e09091509
     # via twine
-manageprojects==0.12.1 \
-    --hash=sha256:bb3db19ada01a096f850c64a80b0362b2d8ebad7a749c98a5248ce4d524422e0 \
-    --hash=sha256:e454f53223c9d2144213219b535d26844ec352c9abaa29fe40fd80e43a71f3e3
-    # via
-    #   ha-services
-    #   inverter-connect (pyproject.toml)
+manageprojects==0.13.0 \
+    --hash=sha256:9feff7b752b1d9710f69cf047bc0e51b73d29d30823e55409b7b6df239f1d501 \
+    --hash=sha256:e12b2ff0f59cf407426e6e11929d254a11e38c6a090b7eb53db3fd15fc2996cf
+    # via inverter-connect (pyproject.toml)
 markdown-it-py==3.0.0 \
     --hash=sha256:355216845c60bd96232cd8d8c40e8f9765cc86f46880e43a8fd22dc1a1a8cab1 \
     --hash=sha256:e3f60a94fa066dc52ec76661e37c851cb232d92f9886b15cb560aaada2df8feb
@@ -539,7 +551,9 @@ mypy==1.4.1 \
     --hash=sha256:ca637024ca67ab24a7fd6f65d280572c3794665eaf5edcc7e90a866544076878 \
     --hash=sha256:e02d700ec8d9b1859790c0475df4e4092c7bf3272a4fd2c9f33d87fac4427b8f \
     --hash=sha256:e5952d2d18b79f7dc25e62e014fe5a23eb1a3d2bc66318df8988a01b1a037c5b
-    # via inverter-connect (pyproject.toml)
+    # via
+    #   inverter-connect (pyproject.toml)
+    #   manageprojects
 mypy-extensions==1.0.0 \
     --hash=sha256:4392f6c0eb8a5668a69e23d168ffa70f0be9ccfd32b5cc2d26a34ae5b844552d \
     --hash=sha256:75dbf8955dc00442a438fc4d0666508a9a97b6bd41aa2f0ffe9d2f2725af0782
@@ -598,11 +612,13 @@ pyflakes==3.1.0 \
     --hash=sha256:4132f6d49cb4dae6819e5379898f2b8cce3c5f23994194c24b77d5da2e36f774 \
     --hash=sha256:a0aae034c444db0071aa077972ba4768d40c830d9539fd45bf4cd3f8f6992efc
     # via
+    #   autoflake
     #   flake8
     #   inverter-connect (pyproject.toml)
-pygments==2.15.1 \
-    --hash=sha256:8ace4d3c1dd481894b2005f560ead0f9f19ee64fe983366be1a21e171d12775c \
-    --hash=sha256:db2db3deb4b4179f399a09054b023b6a586b76499d36965813c71aa8ed7b5fd1
+    #   manageprojects
+pygments==2.16.1 \
+    --hash=sha256:13fc09fa63bc8d8671a6d247e1eb303c4b343eaee81d861f3404db2935653692 \
+    --hash=sha256:1daff0494820c69bc8941e407aa20f577374ee88364ee10a98fdbe0aece96e29
     # via
     #   darker
     #   readme-renderer
@@ -628,7 +644,9 @@ python-slugify==8.0.1 \
 pyupgrade==3.10.1 \
     --hash=sha256:1d8d138c2ccdd3c42b1419230ae036d5607dc69465a26feacc069642fc8d1b90 \
     --hash=sha256:f565b4d26daa46ed522e98746834e77e444269103f8bc04413d77dad95169a24
-    # via inverter-connect (pyproject.toml)
+    # via
+    #   inverter-connect (pyproject.toml)
+    #   manageprojects
 pyyaml==6.0.1 \
     --hash=sha256:062582fca9fabdd2c8b54a3ef1c978d786e0f6b3a1510e0ac93ef59e0ddae2bc \
     --hash=sha256:1635fd110e8d85d55237ab316b5b011de701ea0f29d07611174a1b42f1444741 \
@@ -783,6 +801,7 @@ tomli==2.0.1 \
     --hash=sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc \
     --hash=sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f
     # via
+    #   autoflake
     #   autopep8
     #   black
     #   build
@@ -800,9 +819,9 @@ tomlkit==0.12.1 \
     # via
     #   ha-services
     #   manageprojects
-tox==4.6.4 \
-    --hash=sha256:1b8f8ae08d6a5475cad9d508236c51ea060620126fd7c3c513d0f5c7f29cc776 \
-    --hash=sha256:5e2ad8845764706170d3dcaac171704513cc8a725655219acb62fe4380bdadda
+tox==4.7.0 \
+    --hash=sha256:79399a3d4641d1fd15eb6bd62c2f35923988038bf0ecf37a688b5e7a767de7d7 \
+    --hash=sha256:89120e1568c763924301cfde61ba7d4b5c4615eeb1086d5370deb03e9cf63c41
     # via inverter-connect (pyproject.toml)
 twine==4.0.2 \
     --hash=sha256:929bc3c280033347a00f847236564d1c52a3e61b1ac2516c97c48f3ceab756d8 \
@@ -826,9 +845,9 @@ webencodings==0.5.1 \
     --hash=sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78 \
     --hash=sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923
     # via bleach
-wheel==0.41.0 \
-    --hash=sha256:55a0f0a5a84869bce5ba775abfd9c462e3a6b1b7b7ec69d72c0b83d673a5114d \
-    --hash=sha256:7e9be3bbd0078f6147d82ed9ed957e323e7708f57e134743d2edef3a7b7972a9
+wheel==0.41.1 \
+    --hash=sha256:12b911f083e876e10c595779709f8a88a59f45aacc646492a67fe9ef796c1b47 \
+    --hash=sha256:473219bd4cbedc62cea0cb309089b593e47c15c4a2531015f94e4e3b9a0f6981
     # via pip-tools
 zipp==3.16.2 \
     --hash=sha256:679e51dd4403591b2d6838a48de3d283f3d188412a9782faadf845f298736ba0 \
