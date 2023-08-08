@@ -7,10 +7,13 @@ from bx_py_utils.path import assert_is_file
 import inverter
 
 
+CLI_EPILOG = 'Project Homepage: https://github.com/jedie/inverter-connect'
+
+
 PACKAGE_ROOT = Path(inverter.__file__).parent.parent
 assert_is_file(PACKAGE_ROOT / 'pyproject.toml')
 
-CLI_EPILOG = 'Project Homepage: https://github.com/jedie/inverter-connect'
+DEFINITIONS_PATH = PACKAGE_ROOT / 'inverter' / 'definitions'
 
 
 ERROR_STR_NO_DATA = 'no data'
