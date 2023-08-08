@@ -1,12 +1,15 @@
 from unittest import TestCase
 
 from inverter.data_types import Parameter
-from inverter.definitions import get_definition, get_parameter
+from inverter.definitions import get_definition, get_definition_names, get_parameter
 from inverter.tests import fixtures
 from inverter.utilities.modbus_converter import parse_number
 
 
 class DefinitionsTestCase(TestCase):
+    def test_get_definition_names(self):
+        self.assertEqual(get_definition_names(), ['deye_2mppt', 'deye_4mppt', 'deye_sg04lp3'])
+
     def test_get_definition(self):
         config = fixtures.get_config()
 

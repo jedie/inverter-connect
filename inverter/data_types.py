@@ -11,7 +11,7 @@ from ha_services.mqtt4homeassistant.data_classes import MqttSettings
 from packaging.version import Version
 from rich import print
 
-from inverter.constants import PACKAGE_ROOT, TYPE_MAP
+from inverter.constants import DEFINITIONS_PATH, TYPE_MAP
 
 
 logger = logging.getLogger(__name__)
@@ -83,15 +83,13 @@ class Config:
 
     def __post_init__(self):
         if self.inverter_name:
-            self.definition_file_path = PACKAGE_ROOT / 'inverter' / 'definitions' / f'{self.inverter_name}.yaml'
+            self.definition_file_path = DEFINITIONS_PATH / f'{self.inverter_name}.yaml'
             if not self.definition_file_path.is_file():
                 raise FileNotFoundError(
                     f'Wrong inverter name: {self.inverter_name!r}: File not found: {self.definition_file_path}'
                 )
 
-            self.validation_file_path = (
-                PACKAGE_ROOT / 'inverter' / 'definitions' / f'{self.inverter_name}_validations.yaml'
-            )
+            self.validation_file_path = DEFINITIONS_PATH / f'{self.inverter_name}_validations.yaml'
             if not self.validation_file_path.is_file():
                 raise FileNotFoundError(
                     f'Wrong inverter name: {self.inverter_name!r}: File not found: {self.validation_file_path}'

@@ -28,6 +28,7 @@ from inverter.api import Inverter, fetch_inverter_versions, set_current_time
 from inverter.connection import InverterSock
 from inverter.constants import SETTINGS_DIR_NAME, SETTINGS_FILE_NAME
 from inverter.data_types import InverterRegisterVersionInfo
+from inverter.definitions import get_definition_names
 from inverter.exceptions import ReadInverterError
 from inverter.publish_loop import publish_forever
 from inverter.user_settings import SystemdServiceInfo, UserSettings, make_config, migrate_old_settings
@@ -124,7 +125,7 @@ option_kwargs_port = dict(
 )
 option_kwargs_inverter_name = dict(
     required=True,
-    type=str,
+    type=click.Choice(get_definition_names(), case_sensitive=False),
     default=user_settings.inverter.name,
     help='Prefix of yaml config files in inverter/definitions/',
     show_default=True,
