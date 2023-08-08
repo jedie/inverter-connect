@@ -560,7 +560,7 @@ def test_mqtt_connection(verbosity: int):
 
     setup_logging(verbosity=verbosity)
 
-    mqttc = get_connected_client(settings=user_settings.mqtt, verbose=True)
+    mqttc = get_connected_client(settings=user_settings.mqtt, verbosity=verbosity)
     mqttc.loop_start()
     mqttc.loop_stop()
     mqttc.disconnect()
