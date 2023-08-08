@@ -140,6 +140,7 @@ Usage: ./cli.py print-values [OPTIONS]
 │    --verbosity  -v  INTEGER RANGE [0<=x<=3]  Verbosity level; Accepts integer value e.g.:        │
 │                                              "--verbose 2" or can be count e.g.: "-vv"           │
 │                                              [default: 0; 0<=x<=3]                               │
+│    --compact    -c                           Only show the values concerning power generation    │
 │    --help                                    Show this message and exit.                         │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
