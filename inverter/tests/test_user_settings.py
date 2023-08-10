@@ -5,8 +5,8 @@ from unittest import TestCase
 
 from bx_py_utils.environ import OverrideEnviron
 from bx_py_utils.path import assert_is_file
-from ha_services.cli_tools.test_utils.assertion import assert_in
-from ha_services.toml_settings.api import TomlSettings
+from cli_base.cli_tools.test_utils.assertion import assert_in
+from cli_base.toml_settings.api import TomlSettings
 
 from inverter.user_settings import SystemdServiceInfo, UserSettings, migrate_old_settings
 

@@ -6,11 +6,11 @@ import sys
 from pathlib import Path
 
 import tomlkit
-from ha_services.cli_tools.rich_utils import human_error
+from cli_base.cli_tools.rich_utils import human_error
+from cli_base.systemd.data_classes import BaseSystemdServiceInfo, BaseSystemdServiceTemplateContext
+from cli_base.toml_settings.api import TomlSettings
+from cli_base.toml_settings.serialize import dataclass2toml
 from ha_services.mqtt4homeassistant.data_classes import MqttSettings as OriginMqttSettings
-from ha_services.systemd.data_classes import BaseSystemdServiceInfo, BaseSystemdServiceTemplateContext
-from ha_services.toml_settings.api import TomlSettings
-from ha_services.toml_settings.serialize import dataclass2toml
 from rich import print  # noqa
 from tomlkit import TOMLDocument
 

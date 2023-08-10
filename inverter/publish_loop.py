@@ -1,7 +1,7 @@
 import logging
 import time
 
-from ha_services.cli_tools.rich_utils import human_error
+from cli_base.cli_tools.rich_utils import human_error
 from ha_services.mqtt4homeassistant.converter import values2mqtt_payload
 from ha_services.mqtt4homeassistant.data_classes import HaValue, HaValues
 from ha_services.mqtt4homeassistant.mqtt import HaMqttPublisher
