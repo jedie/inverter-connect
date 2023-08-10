@@ -11,6 +11,10 @@ backoff==2.2.1 \
 bx-py-utils==85 \
     --hash=sha256:8d6ee4bb0c431304b812f5bebb1bc8e2ab05f1b6c2f8d16d352cbcee5e916cd2 \
     --hash=sha256:df023fa05cda8e969d2cbdb4cc348d8b7670567a2fe775faf7a0c869ec56eaa2
+    # via cli-base-utilities
+cli-base-utilities==0.2.0 \
+    --hash=sha256:4fb89f4980c45eeeae69c7d745ddf7449740d42a072a42dd2c46ae1519ad7128 \
+    --hash=sha256:5edd26c07063ab031e30712c80fd3b8a2b9dffe33143ebd25cb1bc932a55488e
     # via
     #   ha-services
     #   inverter-connect (pyproject.toml)
@@ -18,12 +22,13 @@ click==8.1.6 \
     --hash=sha256:48ee849951919527a045bfe3bf7baa8a959c423134e1a5b98c05c20ba75a1cbd \
     --hash=sha256:fa244bb30b3b5ee2cae3da8f55c9e5e0c0e86093306301fb418eb9dc40fbded5
     # via
+    #   cli-base-utilities
     #   ha-services
     #   inverter-connect (pyproject.toml)
     #   rich-click
-ha-services==0.3.4 \
-    --hash=sha256:6aec86c901ebb2b26775311ce6c15a23a8156248211d73c88174c458ea1b8d69 \
-    --hash=sha256:b525b44ec1372a40a6438574efbf371db322028a33fb037319a72bc33a676b8f
+ha-services==0.4.0 \
+    --hash=sha256:11085e9bccfedc0a561723eb084ab903c1301fe464d192df154c46a50726b5be \
+    --hash=sha256:e3179926be454c6c3375e19bd545dbbb3f87876e3b95840fe8a469644eeb6791
     # via inverter-connect (pyproject.toml)
 markdown-it-py==3.0.0 \
     --hash=sha256:355216845c60bd96232cd8d8c40e8f9765cc86f46880e43a8fd22dc1a1a8cab1 \
@@ -121,6 +126,7 @@ rich==13.5.2 \
     --hash=sha256:146a90b3b6b47cac4a73c12866a499e9817426423f57c5a66949c086191a8808 \
     --hash=sha256:fb9d6c0a0f643c99eed3875b5377a184132ba9be4d61516a55273d3554d75a39
     # via
+    #   cli-base-utilities
     #   ha-services
     #   inverter-connect (pyproject.toml)
     #   rich-click
@@ -128,9 +134,12 @@ rich-click==1.6.1 \
     --hash=sha256:0fcf4d1a09029d79322dd814ab0b2e66ac183633037561881d45abae8a161d95 \
     --hash=sha256:f8ff96693ec6e261d1544e9f7d9a5811c5ef5d74c8adb4978430fc0dac16777e
     # via
+    #   cli-base-utilities
     #   ha-services
     #   inverter-connect (pyproject.toml)
 tomlkit==0.12.1 \
     --hash=sha256:38e1ff8edb991273ec9f6181244a6a391ac30e9f5098e7535640ea6be97a7c86 \
     --hash=sha256:712cbd236609acc6a3e2e97253dfc52d4c2082982a88f61b640ecf0817eab899
-    # via ha-services
+    # via
+    #   cli-base-utilities
+    #   ha-services

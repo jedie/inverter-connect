@@ -11,11 +11,11 @@ from pathlib import Path
 
 import rich_click
 import rich_click as click
-from ha_services.cli_tools.verbosity import OPTION_KWARGS_VERBOSE, setup_logging
+from cli_base.cli_tools.verbosity import OPTION_KWARGS_VERBOSE, setup_logging
+from cli_base.systemd.api import ServiceControl
+from cli_base.toml_settings.api import TomlSettings
+from cli_base.toml_settings.exceptions import UserSettingsNotFound
 from ha_services.mqtt4homeassistant.mqtt import get_connected_client
-from ha_services.systemd.api import ServiceControl
-from ha_services.toml_settings.api import TomlSettings
-from ha_services.toml_settings.exceptions import UserSettingsNotFound
 from rich import get_console, print  # noqa
 from rich.pretty import pprint
 from rich.table import Table
