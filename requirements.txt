@@ -12,9 +12,9 @@ bx-py-utils==88 \
     --hash=sha256:32fbc7e9ff3dfb0a817c80fb1d165ec559643dab59c0be549e646acbf8223b75 \
     --hash=sha256:3a6f4eeef6abcac834b2c1ea4c5211130fd930a064aa0baabddd7c2bd00e38ac
     # via cli-base-utilities
-cli-base-utilities==0.3.0 \
-    --hash=sha256:1a59a0a61d853b4d3f4944e7494af139bccb3cca4e7766e94f452c2f131a1d59 \
-    --hash=sha256:ca73cf149e5fd10312d450d9919a1ed87222c7bdd6479e94ab670ece4d91e8ba
+cli-base-utilities==0.4.0 \
+    --hash=sha256:e71d8e59c56df8f9f53f7d12bc579f7857b2f54a8968344870ae4f1782fd291e \
+    --hash=sha256:f0b82bbf8bc3afb368735b4520444345d334362a26bd7b2bd6b55a24934be4ff
     # via
     #   ha-services
     #   inverter-connect (pyproject.toml)
