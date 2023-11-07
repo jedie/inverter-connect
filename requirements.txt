@@ -12,9 +12,9 @@ bx-py-utils==88 \
     --hash=sha256:32fbc7e9ff3dfb0a817c80fb1d165ec559643dab59c0be549e646acbf8223b75 \
     --hash=sha256:3a6f4eeef6abcac834b2c1ea4c5211130fd930a064aa0baabddd7c2bd00e38ac
     # via cli-base-utilities
-cli-base-utilities==0.4.3 \
-    --hash=sha256:1244679f6059ce75d03813e410791093bf7fef69961ac8339cd2f299f9f25df3 \
-    --hash=sha256:eb2b6c815da649cd43fa6f8c7937d1d93928af84c99be2b56280f0c92fe6bbab
+cli-base-utilities==0.4.4 \
+    --hash=sha256:110bef895fb7dfc29662f463ccedc4c985a880afbde2e6dea387d0d2f96f4985 \
+    --hash=sha256:72d4248776519a21c3448d6e348511ce6fe8c3742c154e158473236c8278fb1c
     # via
     #   ha-services
     #   inverter-connect (pyproject.toml)
@@ -154,9 +154,9 @@ rich-click==1.7.1 \
     #   cli-base-utilities
     #   ha-services
     #   inverter-connect (pyproject.toml)
-tomlkit==0.12.1 \
-    --hash=sha256:38e1ff8edb991273ec9f6181244a6a391ac30e9f5098e7535640ea6be97a7c86 \
-    --hash=sha256:712cbd236609acc6a3e2e97253dfc52d4c2082982a88f61b640ecf0817eab899
+tomlkit==0.12.2 \
+    --hash=sha256:df32fab589a81f0d7dc525a4267b6d7a64ee99619cbd1eeb0fae32c1dd426977 \
+    --hash=sha256:eeea7ac7563faeab0a1ed8fe12c2e5a51c61f933f2502f7e9db0241a65163ad0
     # via
     #   cli-base-utilities
     #   ha-services
