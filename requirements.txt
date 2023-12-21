@@ -4,6 +4,10 @@
 #
 #    ./cli.py update
 #
+async-timeout==4.0.3 \
+    --hash=sha256:4640d96be84d82d02ed59ea2b7105a0f7b33abe8703703cd0ab0bf87c427522f \
+    --hash=sha256:7405140ff1230c310e51dc27b3145b9092d659ce68ff733fb0cefe3ee42be028
+    # via cli-base-utilities
 backoff==2.2.1 \
     --hash=sha256:03f829f5bb1923180821643f8753b0502c3b682293992485b0eef2807afa5cba \
     --hash=sha256:63579f9a0628e06278f7e47b7d7d5b6ce20dc65c5e96a6f3ca99a6adca0396e8
@@ -12,9 +16,9 @@ bx-py-utils==90 \
     --hash=sha256:2c15b3b7d8a8e4f0bc6815517fb732fb303ce6878c3e45bbd60633b2811bf0ea \
     --hash=sha256:bb8aa9bd59b6c733cc8fe65340a98bbff026bbc5aa3c3c01324f27d84b8c9302
     # via cli-base-utilities
-cli-base-utilities==0.6.0 \
-    --hash=sha256:c3e0efafca519f7f79a1aff67d099987d849f1c3d795c4e605b6b9be49537712 \
-    --hash=sha256:e403c6e584508aa69cc093b7a325127f6ef9835624e4fde7f104e941314645a9
+cli-base-utilities==0.7.0 \
+    --hash=sha256:3d13b861d4c96b597b1dc3c6fdbe428dc72c444ab61008cc9555292d7b3ec8b4 \
+    --hash=sha256:fa39bd83900749ece5866ea996d270880081a5155497f74db46995c28b1a9425
     # via
     #   ha-services
     #   inverter-connect (pyproject.toml)
@@ -78,6 +82,10 @@ msgspec==0.18.5 \
     # via
     #   ha-services
     #   inverter-connect (pyproject.toml)
+packaging==23.2 \
+    --hash=sha256:048fb0e9405036518eaaf48a55953c750c11e1a1b68e0dd1a9d62ed0c092cfc5 \
+    --hash=sha256:8c491190033a9af7e1d931d0b5dacc2ef47509b34dd0de67ed209b5203fc88c7
+    # via cli-base-utilities
 paho-mqtt==1.6.1 \
     --hash=sha256:2a8291c81623aec00372b5a85558a372c747cbca8e9934dfe218638b8eefc26f
     # via
@@ -154,6 +162,10 @@ rich-click==1.7.2 \
     #   cli-base-utilities
     #   ha-services
     #   inverter-connect (pyproject.toml)
+tomli==2.0.1 \
+    --hash=sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc \
+    --hash=sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f
+    # via cli-base-utilities
 tomlkit==0.12.3 \
     --hash=sha256:75baf5012d06501f07bee5bf8e801b9f343e7aac5a92581f20f80ce632e6b5a4 \
     --hash=sha256:b0a645a9156dc7cb5d3a1f0d4bab66db287fcb8e0430bdd4664a095ea16414ba
