@@ -12,9 +12,9 @@ backoff==2.2.1 \
     --hash=sha256:03f829f5bb1923180821643f8753b0502c3b682293992485b0eef2807afa5cba \
     --hash=sha256:63579f9a0628e06278f7e47b7d7d5b6ce20dc65c5e96a6f3ca99a6adca0396e8
     # via inverter-connect (pyproject.toml)
-bx-py-utils==90 \
-    --hash=sha256:2c15b3b7d8a8e4f0bc6815517fb732fb303ce6878c3e45bbd60633b2811bf0ea \
-    --hash=sha256:bb8aa9bd59b6c733cc8fe65340a98bbff026bbc5aa3c3c01324f27d84b8c9302
+bx-py-utils==91 \
+    --hash=sha256:d7b595ccafd1b06165d76086760864353b8f561db23398a383e0a49bbd0bcb7d \
+    --hash=sha256:feb75b3b2cdadac5ca034a6b874490f7516d9bcf4980854a0d48703289c387c9
     # via cli-base-utilities
 cli-base-utilities==0.7.0 \
     --hash=sha256:3d13b861d4c96b597b1dc3c6fdbe428dc72c444ab61008cc9555292d7b3ec8b4 \
@@ -155,9 +155,9 @@ rich==13.7.0 \
     #   ha-services
     #   inverter-connect (pyproject.toml)
     #   rich-click
-rich-click==1.7.2 \
-    --hash=sha256:22f93439a3d65f4a04e07cd584f4d01d132d96899766af92ed287618156abbe2 \
-    --hash=sha256:a42bcdcb8696c4ca7a3b1a39e1aba3d2cb64ad00690b4c022fdcb2cbccebc3fc
+rich-click==1.7.3 \
+    --hash=sha256:bc4163d4e2a3361e21c4d72d300eca6eb8896dfc978667923cb1d4937b8769a3 \
+    --hash=sha256:bced1594c497dc007ab49508ff198bb437c576d01291c13a61658999066481f4
     # via
     #   cli-base-utilities
     #   ha-services
