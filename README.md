@@ -99,17 +99,19 @@ Usage: ./cli.py publish-loop [OPTIONS]
  AT-command.
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
-│ *  --ip             TEXT                     IP address of your inverter [required]              │
-│ *  --port           INTEGER                  Port of inverter services [default: 48899]          │
-│                                              [required]                                          │
-│ *  --inverter       TEXT                     Prefix of yaml config files in                      │
-│                                              inverter/definitions/                               │
-│                                              [default: deye_2mppt]                               │
-│                                              [required]                                          │
-│    --verbosity  -v  INTEGER RANGE [0<=x<=3]  Verbosity level; Accepts integer value e.g.:        │
-│                                              "--verbose 2" or can be count e.g.: "-vv"           │
-│                                              [default: 0; 0<=x<=3]                               │
-│    --help                                    Show this message and exit.                         │
+│ *  --ip             TEXT                                  IP address of your inverter [required] │
+│ *  --port           INTEGER                               Port of inverter services              │
+│                                                           [default: 48899]                       │
+│                                                           [required]                             │
+│ *  --inverter       [deye_2mppt|deye_4mppt|deye_sg04lp3]  Prefix of yaml config files in         │
+│                                                           inverter/definitions/                  │
+│                                                           [default: deye_2mppt]                  │
+│                                                           [required]                             │
+│    --verbosity  -v  INTEGER RANGE [0<=x<=3]               Verbosity level; Accepts integer value │
+│                                                           e.g.: "--verbose 2" or can be count    │
+│                                                           e.g.: "-vv"                            │
+│                                                           [default: 0; 0<=x<=3]                  │
+│    --help                                                 Show this message and exit.            │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 [comment]: <> (✂✂✂ auto generated publish-loop help end ✂✂✂)
@@ -130,17 +132,21 @@ Usage: ./cli.py print-values [OPTIONS]
  .../inverter-connect$ ./cli.py print-values
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────╮
-│ *  --ip             TEXT                     IP address of your inverter [required]              │
-│ *  --port           INTEGER                  Port of inverter services [default: 48899]          │
-│                                              [required]                                          │
-│ *  --inverter       TEXT                     Prefix of yaml config files in                      │
-│                                              inverter/definitions/                               │
-│                                              [default: deye_2mppt]                               │
-│                                              [required]                                          │
-│    --verbosity  -v  INTEGER RANGE [0<=x<=3]  Verbosity level; Accepts integer value e.g.:        │
-│                                              "--verbose 2" or can be count e.g.: "-vv"           │
-│                                              [default: 0; 0<=x<=3]                               │
-│    --help                                    Show this message and exit.                         │
+│ *  --ip             TEXT                                  IP address of your inverter [required] │
+│ *  --port           INTEGER                               Port of inverter services              │
+│                                                           [default: 48899]                       │
+│                                                           [required]                             │
+│ *  --inverter       [deye_2mppt|deye_4mppt|deye_sg04lp3]  Prefix of yaml config files in         │
+│                                                           inverter/definitions/                  │
+│                                                           [default: deye_2mppt]                  │
+│                                                           [required]                             │
+│    --verbosity  -v  INTEGER RANGE [0<=x<=3]               Verbosity level; Accepts integer value │
+│                                                           e.g.: "--verbose 2" or can be count    │
+│                                                           e.g.: "-vv"                            │
+│                                                           [default: 0; 0<=x<=3]                  │
+│    --compact    -c                                        Only show the values concerning power  │
+│                                                           generation                             │
+│    --help                                                 Show this message and exit.            │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 [comment]: <> (✂✂✂ auto generated print-values help end ✂✂✂)

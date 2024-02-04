@@ -7,6 +7,7 @@ import yaml
 from bx_py_utils.dict_utils import pluck
 from bx_py_utils.path import assert_is_file
 
+from inverter.constants import DEFINITIONS_PATH
 from inverter.data_types import Config, Parameter
 from inverter.utilities.modbus_converter import (
     debug_converter,
@@ -30,6 +31,16 @@ RULE2CONVERTER = {
 }
 
 
+def get_definition_names() -> list[str]:
+    names = []
+    for item in DEFINITIONS_PATH.glob('*.yaml'):
+        name = item.stem
+        if not name.endswith('_validations'):
+            names.append(name)
+    names.sort()
+    return names
+
+
 def get_definition(*, config: Config):
     definition_file_path = config.definition_file_path
     assert_is_file(definition_file_path)
@@ -51,6 +62,9 @@ def get_parameter(*, config: Config) -> Iterable[Parameter]:
     parameters = []
     for group_data in data:
         group_name = group_data['group']
+        if config.compact and group_name not in 'solar':
+            # compact profile only shows data from yaml.config group solar
+            continue
         for item in group_data['items']:
             # example = {
             #     'name': 'PV1 Voltage',

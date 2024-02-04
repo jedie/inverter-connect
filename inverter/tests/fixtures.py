@@ -13,6 +13,7 @@ def get_config(**kwargs) -> Config:
     set_defaults(
         kwargs,
         defaults=dict(
+            compact=True,
             verbosity=0,
             host='123.123.0.1',
             port=48899,

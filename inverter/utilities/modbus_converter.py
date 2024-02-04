@@ -19,7 +19,7 @@ def hex2int(*, data_hex: str, scale, offset) -> int:
     """
     logger.debug(f'{data_hex=} {scale=} {offset=}')
     data = bytes.fromhex(data_hex)
-    number = int.from_bytes(data, byteorder='big')
+    number = int.from_bytes(data, byteorder='big', signed=True)
 
     if offset:
         logger.debug(f'{number=} {offset=}')

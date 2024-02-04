@@ -11,11 +11,11 @@ from pathlib import Path
 
 import rich_click
 import rich_click as click
-from ha_services.cli_tools.verbosity import OPTION_KWARGS_VERBOSE, setup_logging
+from cli_base.cli_tools.verbosity import OPTION_KWARGS_VERBOSE, setup_logging
+from cli_base.systemd.api import ServiceControl
+from cli_base.toml_settings.api import TomlSettings
+from cli_base.toml_settings.exceptions import UserSettingsNotFound
 from ha_services.mqtt4homeassistant.mqtt import get_connected_client
-from ha_services.systemd.api import ServiceControl
-from ha_services.toml_settings.api import TomlSettings
-from ha_services.toml_settings.exceptions import UserSettingsNotFound
 from rich import get_console, print  # noqa
 from rich.pretty import pprint
 from rich.table import Table
@@ -28,6 +28,7 @@ from inverter.api import Inverter, fetch_inverter_versions, set_current_time
 from inverter.connection import InverterSock
 from inverter.constants import SETTINGS_DIR_NAME, SETTINGS_FILE_NAME
 from inverter.data_types import InverterRegisterVersionInfo
+from inverter.definitions import get_definition_names
 from inverter.exceptions import ReadInverterError
 from inverter.publish_loop import publish_forever
 from inverter.user_settings import SystemdServiceInfo, UserSettings, make_config, migrate_old_settings
@@ -124,10 +125,17 @@ option_kwargs_port = dict(
 )
 option_kwargs_inverter_name = dict(
     required=True,
-    type=str,
+    type=click.Choice(get_definition_names(), case_sensitive=False),
     default=user_settings.inverter.name,
     help='Prefix of yaml config files in inverter/definitions/',
     show_default=True,
+)
+option_kwargs_compact = dict(
+    required=False,
+    default=False,
+    help='Only show the values concerning power generation',
+    is_flag=True,
+    show_default=False,
 )
 
 
@@ -244,7 +252,8 @@ cli.add_command(systemd_stop)
 @click.option('--port', **option_kwargs_port)
 @click.option('--inverter', **option_kwargs_inverter_name)
 @click.option('-v', '--verbosity', **OPTION_KWARGS_VERBOSE)
-def print_values(ip, port, inverter, verbosity: int):
+@click.option('-c', '--compact', **option_kwargs_compact)
+def print_values(ip, port, inverter, verbosity: int, compact: bool):
     """
     Print all known register values from Inverter, e.g.:
 
@@ -259,6 +268,7 @@ def print_values(ip, port, inverter, verbosity: int):
         verbosity=verbosity,
         ip=ip,
         port=port,
+        compact=compact,
         inverter=inverter,
     )
 
@@ -550,7 +560,7 @@ def test_mqtt_connection(verbosity: int):
 
     setup_logging(verbosity=verbosity)
 
-    mqttc = get_connected_client(settings=user_settings.mqtt, verbose=True)
+    mqttc = get_connected_client(settings=user_settings.mqtt, verbosity=verbosity)
     mqttc.loop_start()
     mqttc.loop_stop()
     mqttc.disconnect()
@@ -606,7 +616,7 @@ def main():
         width=console.size.width,  # full terminal width
         show_locals=True,
         suppress=[click, rich_click],
-        max_frames=2,
+        max_frames=8,
     )
 
     atexit.register(exit_func)
