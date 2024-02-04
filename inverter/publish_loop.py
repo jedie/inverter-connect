@@ -49,7 +49,9 @@ def publish_forever(*, config: Config, verbosity):
                             elif isinstance(value.value, Version):
                                 ha_value = str(value.value)
 
-                            daily_production_reset(value)
+                            if value.name == 'Total Power' and value.value != 0:
+                                daily_production_reset(value)
+
 
                             values.append(
                                 HaValue(
