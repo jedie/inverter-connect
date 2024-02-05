@@ -1,0 +1,35 @@
+# User settings for inverter-connect
+
+[systemd]
+# Information for systemd helper functions
+template_path = "/home/user/inverter-connect/.venv-app/lib/python3.11/site-packages/ha_services/systemd/service_template.txt"
+systemd_base_path = "/etc/systemd/system"
+service_slug = "inverter_connect"
+service_file_path = "/etc/systemd/system/inverter_connect.service"
+
+[systemd.template_context]
+# Context values for the systemd service file content
+verbose_service_name = "Inverter Connect"
+user = "user"
+group = "user"
+work_dir = "/home/user/inverter-connect"
+exec_start = "/home/user/inverter-connect/.venv-app/bin/python -m inverter publish-loop"
+syslog_identifier = "inverter_connect"
+config_path = "/home/user/.config/inverter-connect"
+
+[mqtt]
+# MQTT server settings.
+host = "127.0.0.1"
+port = 1883
+user_name = "mqtt"
+password = "<i-am-not-telling>"
+
+[inverter]
+# The "name" is the prefix of "inverter/definitions/*.yaml" files!
+#
+# Set "ip" of the inverter if it's always the same. (Hint: Pin it in FritzBox settings ;)
+# You can leave it empty, but then you must always pass "--ip" to CLI commands.
+# Even if it is specified here, you can always override it in the CLI with "--ip".
+name = "deye_2mppt"
+ip = "192.168.2.33"
+port = 48899

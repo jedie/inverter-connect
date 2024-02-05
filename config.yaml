@@ -1,0 +1,15 @@
+name: "Deye Inverter"
+description: "Inverter Connect for Deye solar inverters"
+version: "0.2.0"
+slug: "inverter_connect"
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+#ports:
+#  123/tcp: 123
+#map:
+#  - addon_config:ro

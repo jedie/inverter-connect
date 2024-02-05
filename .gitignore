@@ -5,6 +5,8 @@ __pycache__
 /coverage.json
 /coverage.xml
 
+cfg/inverter-connect.toml
+
 !.github
 !.editorconfig
 !.flake8
