@@ -9,7 +9,4 @@ arch:
   - armhf
   - armv7
   - i386
-#ports:
-#  123/tcp: 123
-#map:
-#  - addon_config:ro
+host_network: true
