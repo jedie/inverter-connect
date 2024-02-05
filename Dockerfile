@@ -47,5 +47,6 @@ USER user
 
 RUN ./cli.py --help
 
-CMD ["/bin/bash"]
-#CMD ["./cli.py", "publish-loop"]
+#CMD ["/bin/bash"]
+#CMD ["./cli.py", "publish-loop", ">/dev/null"]
+CMD ["./cli.py", "publish-loop"]
