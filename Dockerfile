@@ -42,8 +42,8 @@ USER user
 #ENV PYTHONUNBUFFERED=1
 
 # activate virtual environment
-#ENV VIRTUAL_ENV=/home/user/venv
-#ENV PATH="/home/myuser/venv/bin:$PATH"
+#ENV VIRTUAL_ENV=/home/user/inverter-connect/.venv-app
+#ENV PATH="/home/user/inverter-connect/.venv-app/bin:$PATH"
 
 RUN ./cli.py --help
 
