@@ -85,7 +85,7 @@ def publish_forever(*, config: Config, verbosity):
                         publisher.publish2homeassistant(ha_mqtt_payload=ha_mqtt_payload)
         except ReadTimeout as err:
             print(f'[red]{err}')
-        except BaseException as err:
+        except Exception as err:
             print(f'[red]{err}')
             logger.exception('Unexpected error: %s', err)
 
