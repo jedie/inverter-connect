@@ -1,4 +1,9 @@
-# inverter
+# inverter-connect
+
+
+**New maintainer wanted!**
+I will no longer use Deye devices. Partly because of the #RelaisGate.
+
 
 [![tests](https://github.com/jedie/inverter-connect/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/jedie/inverter-connect/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/github/jedie/inverter-connect/branch/main/graph/badge.svg)](https://app.codecov.io/github/jedie/inverter-connect)
