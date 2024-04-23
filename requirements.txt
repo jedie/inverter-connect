@@ -12,13 +12,13 @@ backoff==2.2.1 \
     --hash=sha256:03f829f5bb1923180821643f8753b0502c3b682293992485b0eef2807afa5cba \
     --hash=sha256:63579f9a0628e06278f7e47b7d7d5b6ce20dc65c5e96a6f3ca99a6adca0396e8
     # via inverter-connect (pyproject.toml)
-bx-py-utils==91 \
-    --hash=sha256:d7b595ccafd1b06165d76086760864353b8f561db23398a383e0a49bbd0bcb7d \
-    --hash=sha256:feb75b3b2cdadac5ca034a6b874490f7516d9bcf4980854a0d48703289c387c9
+bx-py-utils==92 \
+    --hash=sha256:38641b2e1a09ed0c64cd6ba0e03c97fea347302439db0234a0492c365ae32719 \
+    --hash=sha256:849c59429af6ca0bf35265569884193c60be578285a66b533146e5782a10637b
     # via cli-base-utilities
-cli-base-utilities==0.7.0 \
-    --hash=sha256:3d13b861d4c96b597b1dc3c6fdbe428dc72c444ab61008cc9555292d7b3ec8b4 \
-    --hash=sha256:fa39bd83900749ece5866ea996d270880081a5155497f74db46995c28b1a9425
+cli-base-utilities==0.8.0 \
+    --hash=sha256:1009551eba81b33a0315c4fcfe3b6ef1633a99e303c9562dff39b824bff83ff0 \
+    --hash=sha256:79628db9fc7ca01b5ab18c97c8fa5f3d8b96af9975c608f7fee9a44256edb2ab
     # via
     #   ha-services
     #   inverter-connect (pyproject.toml)
@@ -30,9 +30,47 @@ click==8.1.7 \
     #   ha-services
     #   inverter-connect (pyproject.toml)
     #   rich-click
-ha-services==0.4.0 \
-    --hash=sha256:11085e9bccfedc0a561723eb084ab903c1301fe464d192df154c46a50726b5be \
-    --hash=sha256:e3179926be454c6c3375e19bd545dbbb3f87876e3b95840fe8a469644eeb6791
+frozendict==2.4.2 \
+    --hash=sha256:07153e6d2720fa1131bb180ce388c7042affb29561d8bcd1c0d6e683a8beaea2 \
+    --hash=sha256:1412aeb325e4a28cfe32106c66c046372bb7fd5a9af1748193549c5d01a9e9c1 \
+    --hash=sha256:146129502cd9d96de64e0c8f7dc4c66422da3d4bfccf891dd80a3821b358a926 \
+    --hash=sha256:19743495b1e92a7e4db56fcd6a5d36ea1d1b0f550822d6fd780e44d58f0b8c18 \
+    --hash=sha256:19e64630e164a297f83e9a1c69f1cd36fa4b3d1196c1f9fc006a0385aa198ea4 \
+    --hash=sha256:20a6f741c92fdeb3766924cde42b8ee445cf568e3be8aa983cb83e9fe5b61e63 \
+    --hash=sha256:34704f9ffb21448d4b5c0f9239f8f058c0efab4bfdbe2956c5be978fef0b929c \
+    --hash=sha256:3fc6e3158107b5431255978b954758b1041cc70a3b8e7657373110512eb528e3 \
+    --hash=sha256:476e4857e1d87b05c9102dd5409216ce4716cb7df619e6657429bc99279303cc \
+    --hash=sha256:4a5841681e70d2862ca153543f2912e0bab034bf29e2d3610e86ea42506121c2 \
+    --hash=sha256:4a8b298f39242d25770d029588ce9d4f524e9f4edc60d2d34b6178fb07c8a93e \
+    --hash=sha256:4ca09a376114172e4d9918e6d576f58244c45e21f5af1245085699fd3a171c47 \
+    --hash=sha256:4db1d6cc412bd865cab36723995208b82166a97bc6c724753bcd2b90cf24f164 \
+    --hash=sha256:5280d685cd1659883a3010dec843afe3065416ae92e453498997d4474a898a39 \
+    --hash=sha256:55953aa2acf5bf183c664f3d0f540f8c8ac8f5fa97170f2098d413414318eb2b \
+    --hash=sha256:741779e1d1a2e6bb2c623f78423bd5d14aad35dc0c57e6ccc89e54eaab5f1b8a \
+    --hash=sha256:79e1c94ad2a925ad5723d82a4134c6d851d5a7bc72b7e9da8b2087c42758a512 \
+    --hash=sha256:7a8d2ea4f10505ad15f53ce3742420682d916d0c4d566edb8e1019756e7cea30 \
+    --hash=sha256:7d13ffe649e9db6f4bb5e107d9be7dfd23e13101bc69f97aa5fa6cbf6aecaadd \
+    --hash=sha256:81efb4ea854a1c93d954a67389eaf78c508acb2d4768321a835cda2754ec5c01 \
+    --hash=sha256:83cc9d063131fd8adbeb18a473d222b5dc8301cac9505cfe578158f9a9bf55a9 \
+    --hash=sha256:84c36bfa819cd8442f6e0bdb86413c7678b2822a46b1a22cfa0f0dd30d9e5c45 \
+    --hash=sha256:92c46b155ea9eb9ecabc66ba2d9030f2634319f55c6448688965ece094f14b51 \
+    --hash=sha256:9ac1f74ccf818977abbc1868090c06436b8f06534d306f808f15cffc304ae046 \
+    --hash=sha256:ac954be447a907face9b652207fbd943b9b552212890db959ba653e8f1dc3f56 \
+    --hash=sha256:bedb0a6587bae53bd53727b92a87c4cf90ad7a7e0bd2db562d439beb6982712e \
+    --hash=sha256:c157b8a92743a7905b341edb0663044fecdc7780f96c59a2843d3da68d694b90 \
+    --hash=sha256:c5f1a4d9662b854dce52b560b60f51349905dc871826b8c6be20141a13067a53 \
+    --hash=sha256:cbab325c0a98b2f3ee291b36710623781b4977a3057f9103a7b0f11bcc23b177 \
+    --hash=sha256:cead3bfe70c90c634a9b76807c9d7e75e6c5666ec96fa2cea8e7412ccf22a1f8 \
+    --hash=sha256:d4a10119f17552cbeab48d4ae830ba091c6d47616589618adc31f251184579a7 \
+    --hash=sha256:f7a90ea6d5248617a1222daef07d22fb146ff07635a36db327e1ce114bf3e304 \
+    --hash=sha256:f7ce0535f02eba9746e4e2cf0abef0f0f2051d20fdccf4af31bc3d1adecf5a71 \
+    --hash=sha256:f7e0ff5e84742604a1b42c2de4f1e67630c0868cf52a5c585b54a99e06f6b453 \
+    --hash=sha256:f958d40637e0440bce2453019821c94fe86cfc5f3847ae11cd4f02c3548b1d1b \
+    --hash=sha256:ff6fb5831539fffb09d71cc0cc0462b1f27c0160cb6c6fa2d1f4c1bc7fffe52a
+    # via ha-services
+ha-services==2.6.0 \
+    --hash=sha256:55468ad8454e0b87a1f0ec5b934b1c98d864a1ae200faf4bdc3efd5c8c61c963 \
+    --hash=sha256:d6887bdfda0a014ca4cf77fa08897604db0692d680fe1a7cc7c72644fdd288db
     # via inverter-connect (pyproject.toml)
 markdown-it-py==3.0.0 \
     --hash=sha256:355216845c60bd96232cd8d8c40e8f9765cc86f46880e43a8fd22dc1a1a8cab1 \
@@ -82,15 +120,34 @@ msgspec==0.18.6 \
     # via
     #   ha-services
     #   inverter-connect (pyproject.toml)
-packaging==23.2 \
-    --hash=sha256:048fb0e9405036518eaaf48a55953c750c11e1a1b68e0dd1a9d62ed0c092cfc5 \
-    --hash=sha256:8c491190033a9af7e1d931d0b5dacc2ef47509b34dd0de67ed209b5203fc88c7
+packaging==24.0 \
+    --hash=sha256:2ddfb553fdf02fb784c234c7ba6ccc288296ceabec964ad2eae3777778130bc5 \
+    --hash=sha256:eb82c5e3e56209074766e6885bb04b8c38a0c015d0a30036ebe7ece34c9989e9
     # via cli-base-utilities
-paho-mqtt==1.6.1 \
-    --hash=sha256:2a8291c81623aec00372b5a85558a372c747cbca8e9934dfe218638b8eefc26f
+paho-mqtt==2.0.0 \
+    --hash=sha256:13b205f29251e4f2c66a6c923c31fc4fd780561e03b2d775cff8e4f2915cf947 \
+    --hash=sha256:2ef745073dfc9aa68bfec30d0b9b6f0304ea75182bae85a7c77a80cefce1eff5
     # via
     #   ha-services
     #   inverter-connect (pyproject.toml)
+psutil==5.9.8 \
+    --hash=sha256:02615ed8c5ea222323408ceba16c60e99c3f91639b07da6373fb7e6539abc56d \
+    --hash=sha256:05806de88103b25903dff19bb6692bd2e714ccf9e668d050d144012055cbca73 \
+    --hash=sha256:26bd09967ae00920df88e0352a91cff1a78f8d69b3ecabbfe733610c0af486c8 \
+    --hash=sha256:27cc40c3493bb10de1be4b3f07cae4c010ce715290a5be22b98493509c6299e2 \
+    --hash=sha256:36f435891adb138ed3c9e58c6af3e2e6ca9ac2f365efe1f9cfef2794e6c93b4e \
+    --hash=sha256:50187900d73c1381ba1454cf40308c2bf6f34268518b3f36a9b663ca87e65e36 \
+    --hash=sha256:611052c4bc70432ec770d5d54f64206aa7203a101ec273a0cd82418c86503bb7 \
+    --hash=sha256:6be126e3225486dff286a8fb9a06246a5253f4c7c53b475ea5f5ac934e64194c \
+    --hash=sha256:7d79560ad97af658a0f6adfef8b834b53f64746d45b403f225b85c5c2c140eee \
+    --hash=sha256:8cb6403ce6d8e047495a701dc7c5bd788add903f8986d523e3e20b98b733e421 \
+    --hash=sha256:8db4c1b57507eef143a15a6884ca10f7c73876cdf5d51e713151c1236a0e68cf \
+    --hash=sha256:aee678c8720623dc456fa20659af736241f575d79429a0e5e9cf88ae0605cc81 \
+    --hash=sha256:bc56c2a1b0d15aa3eaa5a60c9f3f8e3e565303b465dbf57a1b730e7a2b9844e0 \
+    --hash=sha256:bd1184ceb3f87651a67b2708d4c3338e9b10c5df903f2e3776b62303b26cb631 \
+    --hash=sha256:d06016f7f8625a1825ba3732081d77c94589dca78b7a3fc072194851e88461a4 \
+    --hash=sha256:d16bbddf0693323b8c6123dd804100241da461e41d6e332fb0ba6058f630f8c8
+    # via ha-services
 pygments==2.17.2 \
     --hash=sha256:b27c2826c47d0f3219f29554824c30c5e8945175d888647acd804ddd04af846c \
     --hash=sha256:da46cec9fd2de5be3a8a784f434e4c4ab670b4ff54d605c4c2717e9d49c4c367
@@ -148,17 +205,17 @@ pyyaml==6.0.1 \
     --hash=sha256:fd1592b3fdf65fff2ad0004b5e363300ef59ced41c2e6b3a99d4089fa8c5435d \
     --hash=sha256:fd66fc5d0da6d9815ba2cebeb4205f95818ff4b79c3ebe268e75d961704af52f
     # via inverter-connect (pyproject.toml)
-rich==13.7.0 \
-    --hash=sha256:5cb5123b5cf9ee70584244246816e9114227e0b98ad9176eede6ad54bf5403fa \
-    --hash=sha256:6da14c108c4866ee9520bbffa71f6fe3962e193b7da68720583850cd4548e235
+rich==13.7.1 \
+    --hash=sha256:4edbae314f59eb482f54e9e30bf00d33350aaa94f4bfcd4e9e3110e64d0d7222 \
+    --hash=sha256:9be308cb1fe2f1f57d67ce99e95af38a1e2bc71ad9813b0e247cf7ffbcc3a432
     # via
     #   cli-base-utilities
     #   ha-services
     #   inverter-connect (pyproject.toml)
     #   rich-click
-rich-click==1.7.3 \
-    --hash=sha256:bc4163d4e2a3361e21c4d72d300eca6eb8896dfc978667923cb1d4937b8769a3 \
-    --hash=sha256:bced1594c497dc007ab49508ff198bb437c576d01291c13a61658999066481f4
+rich-click==1.7.4 \
+    --hash=sha256:7ce5de8e4dc0333aec946113529b3eeb349f2e5d2fafee96b9edf8ee36a01395 \
+    --hash=sha256:e363655475c60fec5a3e16a1eb618118ed79e666c365a36006b107c17c93ac4e
     # via
     #   cli-base-utilities
     #   ha-services
@@ -167,13 +224,13 @@ tomli==2.0.1 \
     --hash=sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc \
     --hash=sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f
     # via cli-base-utilities
-tomlkit==0.12.3 \
-    --hash=sha256:75baf5012d06501f07bee5bf8e801b9f343e7aac5a92581f20f80ce632e6b5a4 \
-    --hash=sha256:b0a645a9156dc7cb5d3a1f0d4bab66db287fcb8e0430bdd4664a095ea16414ba
+tomlkit==0.12.4 \
+    --hash=sha256:5cd82d48a3dd89dee1f9d64420aa20ae65cfbd00668d6f094d7578a78efbb77b \
+    --hash=sha256:7ca1cfc12232806517a8515047ba66a19369e71edf2439d0f5824f91032b6cc3
     # via
     #   cli-base-utilities
     #   ha-services
-typing-extensions==4.9.0 \
-    --hash=sha256:23478f88c37f27d76ac8aee6c905017a143b0b1b886c3c9f66bc2fd94f9f5783 \
-    --hash=sha256:af72aea155e91adfc61c3ae9e0e342dbc0cba726d6cba4b6c72c1f34e47291cd
+typing-extensions==4.11.0 \
+    --hash=sha256:83f085bd5ca59c80295fc2a82ab5dac679cbe02b9f33f7d83af68e241bea51b0 \
+    --hash=sha256:c1f94d72897edaf4ce775bb7558d5b79d8126906a14ea5ed1635921406c0387a
     # via rich-click
