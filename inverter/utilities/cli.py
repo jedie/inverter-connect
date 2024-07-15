@@ -71,7 +71,7 @@ def print_register(inv_sock, start_register, length):
         )
 
 
-def print_inverter_versions(results: list[InverterRegisterVersionResult], title='Inventer Version Information'):
+def print_inverter_versions(results: list[InverterRegisterVersionResult], title='Inverter Version Information'):
     table = Table(title=title)
     table.add_column('Counter\n', justify='right')
     table.add_column('Name\n', justify='right')
