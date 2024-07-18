@@ -161,6 +161,6 @@ def fetch_inverter_versions(
         print(f'Fetch "{info.name}"', end='...')
         response: ModbusResponse = inv_sock.read(start_register=info.register, length=1)
         print(f'Result (in hex): [cyan]{response.data_hex}')
-        version = Version('.'.join(number for number in response.data_hex))
+        version = Version('.'.join(str(int(number, 16)) for number in response.data_hex))
         results.append(InverterRegisterVersionResult(info=info, data_hex=response.data_hex, version=version))
     return results
