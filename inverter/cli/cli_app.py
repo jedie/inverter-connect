@@ -533,12 +533,18 @@ def inverter_version(ip, port, verbosity: int):
         except ReadInverterError as err:
             print(f'[red]{err}')
             sys.exit(1)
+        if user_settings.inverter.name == 'deye_sg04lp3':
+            infos = [
+                InverterRegisterVersionInfo(name='MCU1', register=0x000E, inverter='deye_sg04lp3'),
+                InverterRegisterVersionInfo(name='MCU2', register=0x0011, inverter='deye_sg04lp3'),
+            ]
+        else:
+            infos = [
+                InverterRegisterVersionInfo(name='Control Board Firmware', register=0x000D),
+                InverterRegisterVersionInfo(name='Communication Board Firmware', register=0x000E),
+                InverterRegisterVersionInfo(name='Communication Protocol', register=0x0012),
+            ]
 
-        infos = [
-            InverterRegisterVersionInfo(name='Control Board Firmware', register=0x000D),
-            InverterRegisterVersionInfo(name='Communication Board Firmware', register=0x000E),
-            InverterRegisterVersionInfo(name='Communication Protocol', register=0x0012),
-        ]
         results = fetch_inverter_versions(inv_sock=inv_sock, infos=infos)
 
     print_inverter_versions(results)

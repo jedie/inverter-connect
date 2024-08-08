@@ -143,6 +143,7 @@ class Validators(msgspec.Struct):
 class InverterRegisterVersionInfo:
     name: str
     register: int
+    inverter: str | None = None
 
 
 @dataclasses.dataclass

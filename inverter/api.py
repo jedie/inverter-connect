@@ -22,7 +22,6 @@ from inverter.definitions import get_parameter
 from inverter.exceptions import ValidationError
 from inverter.validators import InverterValueValidator
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -159,8 +158,13 @@ def fetch_inverter_versions(
     results = []
     for info in infos:
         print(f'Fetch "{info.name}"', end='...')
-        response: ModbusResponse = inv_sock.read(start_register=info.register, length=1)
+        if info.inverter == 'deye_sg04lp3':
+            response: ModbusResponse = inv_sock.read(start_register=info.register, length=2)
+            version = '-'.join(response.data_hex[i:i + 4] for i in range(0, len(response.data_hex), 4))
+        else:
+            response: ModbusResponse = inv_sock.read(start_register=info.register, length=1)
+            version = Version('.'.join(number for number in response.data_hex))
+
         print(f'Result (in hex): [cyan]{response.data_hex}')
-        version = Version('.'.join(number for number in response.data_hex))
         results.append(InverterRegisterVersionResult(info=info, data_hex=response.data_hex, version=version))
     return results
