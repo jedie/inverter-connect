@@ -1,7 +1,7 @@
 validators:
     - name: "Radiator Temperature"
       type: "float"
-      min_value: -9.9
+      min_value: -99.9
       max_value: 100
 
     - name: "Total AC Output Power (Active)"

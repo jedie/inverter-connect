@@ -87,7 +87,7 @@ def print_inverter_versions(results: list[InverterRegisterVersionResult], title=
             hex(result.info.register + offset),  # Address (hex)
             str(result.info.register + offset),  # Address (dec)
             result.data_hex,  # Hex value
-            f'v{result.version}',  # Human readable version
+            f'{result.version}',  # Human readable version
         )
 
     console = get_console()
